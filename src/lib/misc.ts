@@ -34,25 +34,3 @@ export const direction = [
   // Diagonal
   Direction.TopLeft, Direction.TopRight, Direction.BottomRight, Direction.BottomLeft
 ]
-
-export const numberOfTilesToEdge = (): number[][] => {
-  const temp:number[][] = [];
-
-  for(let file = 0; file < 8; file++){
-    for(let rank = 0; rank < 8; rank++){
-      let nNorth = 7 - rank;
-      let nEast = 7 - file;
-      let nSouth = rank;
-      let nWest = file;
-      
-      let tile = rank * 8 + file
-
-      temp[tile] = [
-        nNorth, nEast, nSouth, nWest,
-        Math.min(nNorth, nWest), Math.min(nNorth, nEast), Math.min(nSouth, nEast), Math.min(nSouth, nWest),
-      ]
-    }
-  }
-
-  return temp
-}
