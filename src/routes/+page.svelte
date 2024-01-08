@@ -19,7 +19,6 @@
 		</div>
 	</main>
 	<div class="sidebar col-span-2">b</div>
-	{limit[9]}
 </div>
 
 
