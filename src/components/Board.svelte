@@ -19,9 +19,7 @@
     {/each}
   {/each}
 
-  <div class="absolute inset-0 grid grid-cols-8 grid-rows-8">
-    <slot/>
-  </div>
+  <slot/>
 </div>
 
 

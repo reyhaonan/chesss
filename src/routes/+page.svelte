@@ -4,40 +4,34 @@
 	<main class="content col-span-8">
 
 		<div class="w-full flex items-center justify-center my-8">
+			
+  
 			<Board>
-				{#each boardArray as pawn, i}
-				<Tile pieceNumber={pawn} 
-					highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
-					highlightSelectedTile={selectedTile === i}
-					on:click={() => {
-					if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
-					else selectedTile = i
-				}}/>
-					<!-- <button class={`flex items-center justify-center relative`}
-					on:click={() => {
-						if(moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
-						else selectedTile = i
-					}}
-					class:bg-red-600={moveList.find(move => move.start === selectedTile && move.target === i)}
-					class:bg-red-500={selectedTile === i}>
+				<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
+					{#each boardArray as pawn, i}
+						<Tile pieceNumber={pawn} 
+							highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
+							highlightSelectedTile={selectedTile === i}
+							on:click={
+								() => {
+									if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
+									else selectedTile = i
+								}
+							}
+							on:drop={() => {
+								if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
+							}}
+							on:dragend={() => selectedTile = -1}
+							on:dragstart={() => selectedTile = i}
+						/>
+					{/each}
 
-
-						<div class="absolute left-0 bottom-0 text-xs">
-							{i}
-						</div>
-					</button> -->
-				{/each}
+				</div>
 			</Board>
 		</div>
 	</main>
 	<div class="sidebar col-span-2">b</div>
 </div>
-
-
-
-
-
-
 
 
 <script lang="ts">
@@ -122,12 +116,14 @@
 			}
 		}
 		
-
-		
-		
 	}
 
-	
+
+	function handleDragDrop (e: DragEvent)  {
+		e.preventDefault();
+		console.log(e)
+	}
+
 
 
 </script>
