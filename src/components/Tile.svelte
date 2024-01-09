@@ -8,9 +8,17 @@
 >
   {#if !!pieceNumber}
     <img src={`/pawn_default/${pieceNumber}.svg`} 
-    class="select-none w-4/5 z-20" alt="" draggable=true
+    class="select-none w-4/5 z-20"
+    class:opacity-0={areDragging}
+    alt="" draggable={correctTurn?true:false}
     on:dragstart
+    on:dragstart={()=>{
+      if(correctTurn)areDragging = true
+    }}
     on:dragend
+    on:dragend={()=>{
+      if(correctTurn)areDragging = false
+    }}
     />
   {/if}
 
@@ -25,8 +33,16 @@
 </div>
 
 <script lang="ts">
+	import { Piece } from "$lib/method";
+	import type { Color } from "$lib/misc";
+
   export let pieceNumber:number = 0;
   export let highlightForMoveSuggestion = false
   export let highlightSelectedTile = false
 
+  export let turn:Color;
+
+  $: correctTurn = Piece.sameColor(pieceNumber, turn)
+
+  let areDragging = false
 </script>

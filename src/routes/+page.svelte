@@ -23,6 +23,8 @@
 							}}
 							on:dragend={() => selectedTile = -1}
 							on:dragstart={() => selectedTile = i}
+
+							turn={turn}
 						/>
 					{/each}
 
