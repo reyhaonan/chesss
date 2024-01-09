@@ -1,7 +1,7 @@
 
 <!-- Graphical only -->
 
-<div class="grid grid-cols-8 w-[550px] aspect-square border-4 border-neutral-800 relative">
+<div class="grid grid-cols-8 aspect-square border-4 border-neutral-800 relative">
   <!-- Indication row -->
   <div class="h-full absolute flex flex-col-reverse justify-around right-full top-0 text-neutral-50">
     {#each Array(8) as num, i}
@@ -15,7 +15,7 @@
   </div>
   {#each board as file, i}
     {#each file as tile, j}
-      <div class={(i + j) % 2 == 0?"bg-emerald-100":"bg-emerald-600"}></div> 
+      <div class={`w-20 aspect-square ${(i + j) % 2 == 0?"bg-emerald-100":"bg-emerald-600"}`}></div> 
     {/each}
   {/each}
 

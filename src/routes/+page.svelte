@@ -6,14 +6,26 @@
 		<div class="w-full flex items-center justify-center my-8">
 			<Board>
 				{#each boardArray as pawn, i}
-					<div class="flex items-center justify-center relative">
-						<Pawn pieceNumber={pawn}/>
+				<Tile pieceNumber={pawn} 
+					highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
+					highlightSelectedTile={selectedTile === i}
+					on:click={() => {
+					if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
+					else selectedTile = i
+				}}/>
+					<!-- <button class={`flex items-center justify-center relative`}
+					on:click={() => {
+						if(moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
+						else selectedTile = i
+					}}
+					class:bg-red-600={moveList.find(move => move.start === selectedTile && move.target === i)}
+					class:bg-red-500={selectedTile === i}>
 
-						<!-- debug -->
+
 						<div class="absolute left-0 bottom-0 text-xs">
 							{i}
 						</div>
-					</div>
+					</button> -->
 				{/each}
 			</Board>
 		</div>
@@ -30,7 +42,7 @@
 
 <script lang="ts">
 	import Board from "$components/Board.svelte";
-	import Pawn from "$components/Pawn.svelte";
+	import Tile from "$components/Tile.svelte";
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color } from "$lib/misc";
 
@@ -40,7 +52,11 @@
 
 	let moveList:Move[] = []
 
+	let selectedTile:number = -1;
+
 	const generateMoves = () => {
+
+		moveList = []
 		
 		for(let i = 0;i < 64;i++){
 			let piece = boardArray[i];
@@ -48,7 +64,13 @@
 			// this piece turn
 			if(Piece.sameColor(piece, turn)){
 				
-				if(!(Piece.isType(piece, Piece.Pawn)||Piece.isType(piece, Piece.Knight))){
+				if(Piece.isType(piece, Piece.Pawn)){
+					// generatePawnMove() 
+				}
+				else if(Piece.isType(piece, Piece.Knight)){
+					// generateKnightMove() 
+				}
+				else{
 					generateSlidingMove(i, piece)
 				}
 			}
@@ -59,6 +81,12 @@
 
 	$: moveList, console.log("moveList",moveList)
 
+	const executeMove = (startTile:number, targetTile:number) => {
+		boardArray[targetTile] = boardArray[startTile];
+		boardArray[startTile] = Piece.None;
+		boardArray = boardArray;
+		selectedTile = -1
+	}
 
 	const generateSlidingMove = (tileIndex: number, piece:number) => {
 
@@ -71,6 +99,10 @@
 		
 		for(let directionIndex = startDirectionIndex;directionIndex < endDirectionIndex;directionIndex++){
 			for(let j = 0;j < numberOfTilesToEdge[tileIndex][directionIndex];j++){
+
+				// if its a king
+				if(Piece.isType(piece, Piece.King) && j >= 1)break;
+
 				let targetTile = tileIndex + direction[directionIndex] * (j + 1)
 
 				let targetPiece = boardArray[targetTile]
