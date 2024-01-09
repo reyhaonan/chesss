@@ -1,4 +1,5 @@
-import { Piece } from "./misc";
+
+import { direction, type Color } from "./misc";
 
 
 // export const generateMoves = (piece: ) => {}
@@ -10,30 +11,30 @@ export const convertFENToBoardArray = (FEN: string) => {
   FEN.split(" ")[0].split("/").forEach((rank) => {
     rank.split("").forEach((piece) => {
       let color: number =
-        piece == piece.toUpperCase() ? Piece["White"] : Piece["Black"];
+        piece == piece.toUpperCase() ? Piece.White : Piece.Black;
 
       switch (piece.toLowerCase()) {
         case "k":
-          boardArray.push(Piece["King"] + color);
+          boardArray.push(Piece.King + color);
           break;
         case "p":
-          boardArray.push(Piece["Pawn"] + color);
+          boardArray.push(Piece.Pawn + color);
           break;
         case "n":
-          boardArray.push(Piece["Knight"] + color);
+          boardArray.push(Piece.Knight + color);
           break;
         case "b":
-          boardArray.push(Piece["Bishop"] + color);
+          boardArray.push(Piece.Bishop + color);
           break;
         case "r":
-          boardArray.push(Piece["Rook"] + color);
+          boardArray.push(Piece.Rook + color);
           break;
         case "q":
-          boardArray.push(Piece["Queen"] + color);
+          boardArray.push(Piece.Queen + color);
           break;
 
         default:
-          boardArray.push(...Array(Number(piece)).fill(Piece["None"]));
+          boardArray.push(...Array(Number(piece)).fill(Piece.None));
       }
     });
   });
@@ -42,7 +43,7 @@ export const convertFENToBoardArray = (FEN: string) => {
 };
 
 
-export const numberOfTilesToEdge = (): number[][] => {
+const generateNumberOfTilesToEdge = (): number[][] => {
   const temp:number[][] = [];
 
   for(let file = 0; file < 8; file++){
@@ -65,4 +66,35 @@ export const numberOfTilesToEdge = (): number[][] => {
   }
 
   return temp
+}
+
+
+
+export const numberOfTilesToEdge = generateNumberOfTilesToEdge()
+
+
+export const Piece = {
+
+  None : 0,
+  King:1,
+  Pawn:2,
+  Knight:3,
+  Bishop:4,
+  Rook:5,
+  Queen:6,
+
+  // 9 is White king
+  // 14 is White queen
+  // 17 is Black king
+  // 22 is Black queen
+  White : 8,
+  Black : 16,
+
+  sameColor : (piece:number, color:Color) => {
+    if(piece == 0)return false
+        // black                       or  white
+    return (piece > 16 && color == "B") || (piece < 16 && color == "W")
+  },
+
+  isType : (piece:number, pieceTypeToCompare:number) => (piece - Piece.Black) === pieceTypeToCompare || (piece - Piece.White) === pieceTypeToCompare
 }
