@@ -25,6 +25,8 @@
 							on:dragstart={() => selectedTile = i}
 
 							turn={turn}
+
+							debugIndex={i}
 						/>
 					{/each}
 
@@ -42,7 +44,8 @@
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/8/RNBQKBNR")
+	// let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/8/RNBQKBNR")
+	let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "W";
 
@@ -61,7 +64,7 @@
 			if(Piece.sameColor(piece, turn)){
 				
 				if(Piece.isType(piece, Piece.Pawn)){
-					// generatePawnMove() 
+					generatePawnMove(i, piece) 
 				}
 				else if(Piece.isType(piece, Piece.Knight)){
 					// generateKnightMove() 
@@ -82,6 +85,34 @@
 		boardArray[startTile] = Piece.None;
 		boardArray = boardArray;
 		selectedTile = -1
+	}
+
+	const generatePawnMove = (tileIndex:number, piece:number)=>{
+		let friendlyColor:Color = piece < 16? "W":"B"
+		let opponentColor:Color = piece < 16? "B":"W"
+
+
+
+		let isOnStartingLine = Piece.sameColor(piece, "W")? Piece.getFile(tileIndex) === 6: Piece.getFile(tileIndex) === 1
+
+		let limit = isOnStartingLine? 2:1
+
+		let pieceTarget = Piece.sameColor(piece, "W")? [4,0,5]:[6,1,7]
+
+		// direction top left, top, top right for white
+		// direction bottom left, , top right for white
+		for(let i = 0; i < 3; i++){
+
+			let limitForDirection = i === 1 ? limit: 1
+			
+			for(let j = 1;j <= limitForDirection;j++){
+
+				let targetTile = tileIndex + (direction[pieceTarget[i]] * j)
+				
+				moveList.push({start:tileIndex, target: targetTile})
+				moveList = moveList
+			}
+		}
 	}
 
 	const generateSlidingMove = (tileIndex: number, piece:number) => {

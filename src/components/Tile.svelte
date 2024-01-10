@@ -4,7 +4,7 @@
   class="w-full flex items-center justify-center relative"
   on:click
   on:drop
-  on:dragover={(e) => {
+    on:dragover={(e) => {
     e.preventDefault()
   }}
 >
@@ -25,6 +25,8 @@
   {#if highlightSelectedTile}
     <div class="absolute inset-0 bg-amber-500/50"></div>
   {/if}
+
+  <div class="absolute right-0 bottom-0 text-xs">{debugIndex}</div>
 </div>
 
 <script lang="ts">
@@ -34,6 +36,8 @@
   export let pieceNumber:number = 0;
   export let highlightForMoveSuggestion = false
   export let highlightSelectedTile = false
+
+  export let debugIndex:number
 
   export let turn:Color;
 

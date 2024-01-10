@@ -96,5 +96,18 @@ export const Piece = {
     return (piece > 16 && color == "B") || (piece < 16 && color == "W")
   },
 
-  isType : (piece:number, pieceTypeToCompare:number) => (piece - Piece.Black) === pieceTypeToCompare || (piece - Piece.White) === pieceTypeToCompare
+  /**
+   * 
+   * @param piece 
+   * @param pieceTypeToCompare 
+   * @returns boolean
+   */
+  isType : (piece:number, pieceTypeToCompare:number) => (piece - Piece.Black) === pieceTypeToCompare || (piece - Piece.White) === pieceTypeToCompare,
+
+  /**
+   * 
+   * @param tileNumber 
+   * @returns 0-7
+   */
+  getFile : (tileNumber:number) => (tileNumber / 8)
 }
