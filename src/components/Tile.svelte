@@ -4,21 +4,16 @@
   class="w-full flex items-center justify-center relative"
   on:click
   on:drop
-  on:dragover={(e) => e.preventDefault()}
+  on:dragover={(e) => {
+    e.preventDefault()
+  }}
 >
   {#if !!pieceNumber}
     <img src={`/pawn_default/${pieceNumber}.svg`} 
-    class="select-none w-4/5 z-20"
-    class:opacity-0={areDragging}
+    class="select-none w-16 z-20 cursor-pointer"
     alt="" draggable={correctTurn?true:false}
     on:dragstart
-    on:dragstart={()=>{
-      if(correctTurn)areDragging = true
-    }}
     on:dragend
-    on:dragend={()=>{
-      if(correctTurn)areDragging = false
-    }}
     />
   {/if}
 
@@ -44,5 +39,4 @@
 
   $: correctTurn = Piece.sameColor(pieceNumber, turn)
 
-  let areDragging = false
 </script>
