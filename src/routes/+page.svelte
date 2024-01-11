@@ -92,14 +92,22 @@
 
 		let pieceToMove = boardArray[startTile]
 
+		let lastEnPassantTarget = enPassantTarget
+
 		enPassantTarget = null;
+
 		boardArray[targetTile] = boardArray[startTile];
 		boardArray[startTile] = Piece.None;
-		boardArray = boardArray;
-		
-		if(Piece.isType(pieceToMove, Piece.Pawn) && Math.abs(targetTile - startTile) === 16){
-			enPassantTarget = targetTile - (targetTile - startTile)/2
+		if(Piece.isType(pieceToMove, Piece.Pawn)){
+			if(Math.abs(targetTile - startTile) === 16)enPassantTarget = targetTile - (targetTile - startTile)/2
+			// Google en passant
+			else if(targetTile === lastEnPassantTarget) {
+				let holyHell = Piece.sameColor(pieceToMove,"W") ? 8: -8
+				boardArray[targetTile + holyHell] = Piece.None
+			}
 		}
+
+		boardArray = boardArray;
 		
 		selectedTile = -1;
 
@@ -130,11 +138,13 @@
 				let targetTile = tileIndex + (direction[pieceTarget[i]] * step)
 				let targetPiece = boardArray[targetTile]
 				
-				// Break out of the loop if diagonal space isnt opponent piece or the space is empty
-				if((targetPiece === Piece.None || Piece.sameColor(targetPiece,friendlyColor)) && i !== 1)break;
-
-				// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendly
-				if(targetPiece !== Piece.None && (i === 1 || Piece.sameColor(targetPiece,friendlyColor)))break
+				if(enPassantTarget !== targetTile){
+					// Break out of the loop if diagonal space isnt opponent piece or the space is empty
+					if((targetPiece === Piece.None || Piece.sameColor(targetPiece,friendlyColor)) && i !== 1)break;
+	
+					// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendly
+					if(targetPiece !== Piece.None && (i === 1 || Piece.sameColor(targetPiece,friendlyColor)))break
+				}
 
 				moveList.push({start:tileIndex, target: targetTile})
 				moveList = moveList
