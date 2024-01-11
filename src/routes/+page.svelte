@@ -26,7 +26,7 @@
 
 							turn={turn}
 
-							debugIndex={Piece.getFile(i)}
+							debugIndex={i - 27}
 						/>
 					{/each}
 
@@ -67,7 +67,7 @@
 					generatePawnMove(i, piece) 
 				}
 				else if(Piece.isType(piece, Piece.Knight)){
-					// generateKnightMove() 
+					generateKnightMove(i) 
 				}
 				else{
 					generateSlidingMove(i, piece)
@@ -90,9 +90,6 @@
 
 	const generatePawnMove = (tileIndex:number, piece:number)=>{
 		let friendlyColor:Color = piece < 16? "W":"B"
-		let opponentColor:Color = piece < 16? "B":"W"
-
-
 
 		let isOnStartingLine = Piece.sameColor(piece, "W")? Piece.getFile(tileIndex) === 6 : Piece.getFile(tileIndex) === 1
 
@@ -104,18 +101,18 @@
 		// direction bottom left, bottom , bottom right for black
 		for(let i = 0; i < 3; i++){
 
-			let limitForDirection = i === 1 ? limit: 1
+			let maxStep = i === 1 ? limit: 1
 			
-			for(let j = 1;j <= limitForDirection;j++){
+			for(let step = 1;step <= maxStep;step++){
 
 				// break out of the loop if the edge is in the way
 				if(numberOfTilesToEdge[tileIndex][direction[pieceTarget[i]]] === 0)break;
 
 
-				let targetTile = tileIndex + (direction[pieceTarget[i]] * j)
+				let targetTile = tileIndex + (direction[pieceTarget[i]] * step)
 				let targetPiece = boardArray[targetTile]
 				
-				// Break out of the loop if diagonal isnt opponent piece or empty
+				// Break out of the loop if diagonal space isnt opponent piece or the space is empty
 				if((targetPiece === Piece.None || Piece.sameColor(targetPiece,friendlyColor)) && i !== 1)break;
 
 				// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendly
@@ -126,6 +123,27 @@
 			}
 		}
 	}
+
+	const generateKnightMove = (tileIndex: number) => {
+  const knightMoveOffsets = [
+    -17, -15, -6, 10, 17, 15, 6, -10
+  ];
+
+  for (let i = 0; i < knightMoveOffsets.length; i++) {
+    const targetTile = tileIndex + knightMoveOffsets[i];
+
+    // Ensure the target tile is within bounds
+    if (numberOfTilesToEdge[tileIndex][Math.floor(i/2)] >= 2) {
+      const targetPiece = boardArray[targetTile];
+
+      // Knight can jump over pieces, so only check for friendly pieces
+      if (!Piece.sameColor(targetPiece, turn)) {
+        moveList.push({ start: tileIndex, target: targetTile });
+      }
+    }
+  }
+};
+
 
 	const generateSlidingMove = (tileIndex: number, piece:number) => {
 
