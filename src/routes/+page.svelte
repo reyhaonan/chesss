@@ -26,7 +26,7 @@
 
 							turn={turn}
 
-							debugIndex={i}
+							debugIndex={Piece.getFile(i)}
 						/>
 					{/each}
 
@@ -44,8 +44,8 @@
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color } from "$lib/misc";
 
-	// let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/8/RNBQKBNR")
-	let boardArray = convertFENToBoardArray(startingFEN)
+	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/pppppppp/8/pppppppp/RNBQKBNR")
+	// let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "W";
 
@@ -84,7 +84,8 @@
 		boardArray[targetTile] = boardArray[startTile];
 		boardArray[startTile] = Piece.None;
 		boardArray = boardArray;
-		selectedTile = -1
+		selectedTile = -1;
+		turn = turn == "B"?"W":"B"
 	}
 
 	const generatePawnMove = (tileIndex:number, piece:number)=>{
@@ -93,22 +94,33 @@
 
 
 
-		let isOnStartingLine = Piece.sameColor(piece, "W")? Piece.getFile(tileIndex) === 6: Piece.getFile(tileIndex) === 1
+		let isOnStartingLine = Piece.sameColor(piece, "W")? Piece.getFile(tileIndex) === 6 : Piece.getFile(tileIndex) === 1
 
 		let limit = isOnStartingLine? 2:1
 
-		let pieceTarget = Piece.sameColor(piece, "W")? [4,0,5]:[6,1,7]
+		let pieceTarget = Piece.sameColor(piece, "W")? [4,0,5]:[7,2,6]
 
 		// direction top left, top, top right for white
-		// direction bottom left, , top right for white
+		// direction bottom left, bottom , bottom right for black
 		for(let i = 0; i < 3; i++){
 
 			let limitForDirection = i === 1 ? limit: 1
 			
 			for(let j = 1;j <= limitForDirection;j++){
 
+				// break out of the loop if the edge is in the way
+				if(numberOfTilesToEdge[tileIndex][direction[pieceTarget[i]]] === 0)break;
+
+
 				let targetTile = tileIndex + (direction[pieceTarget[i]] * j)
+				let targetPiece = boardArray[targetTile]
 				
+				// Break out of the loop if diagonal isnt opponent piece or empty
+				if((targetPiece === Piece.None || Piece.sameColor(targetPiece,friendlyColor)) && i !== 1)break;
+
+				// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendly
+				if(targetPiece !== Piece.None && (i === 1 || Piece.sameColor(targetPiece,friendlyColor)))break
+
 				moveList.push({start:tileIndex, target: targetTile})
 				moveList = moveList
 			}

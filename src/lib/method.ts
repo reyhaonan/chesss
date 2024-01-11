@@ -91,7 +91,6 @@ export const Piece = {
   Black : 16,
 
   sameColor : (piece:number, color:Color) => {
-    if(piece == 0)return false
         // black                       or  white
     return (piece > 16 && color == "B") || (piece < 16 && color == "W")
   },
@@ -102,12 +101,22 @@ export const Piece = {
    * @param pieceTypeToCompare 
    * @returns boolean
    */
-  isType : (piece:number, pieceTypeToCompare:number) => (piece - Piece.Black) === pieceTypeToCompare || (piece - Piece.White) === pieceTypeToCompare,
+  isType : (piece:number, pieceTypeToCompare:number) => {
+    if(piece === Piece.None) return piece === pieceTypeToCompare
+    return (piece - Piece.Black) === pieceTypeToCompare || (piece - Piece.White) === pieceTypeToCompare
+  },
 
   /**
-   * 
+   * return vertical index
    * @param tileNumber 
    * @returns 0-7
    */
-  getFile : (tileNumber:number) => (tileNumber / 8)
+  getFile : (tileNumber:number) => Math.floor(tileNumber / 8),
+  
+  /**
+   * return horizontal index
+   * @param tileNumber 
+   * @returns 0-7
+   */
+  getRank : (tileNumber:number) => (tileNumber % 8)
 }
