@@ -2,6 +2,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
   class="w-full flex items-center justify-center relative"
+  class:cursor-pointer={highlightForMoveSuggestion}
   on:click
   on:drop
     on:dragover={(e) => {

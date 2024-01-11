@@ -5,7 +5,10 @@
 
 		<div class="w-full flex items-center justify-center my-8">
 			
-  
+			<div class="text-white">
+
+				en passant {enPassantTarget}
+			</div>
 			<Board>
 				<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
 					{#each boardArray as pawn, i}
@@ -14,19 +17,20 @@
 							highlightSelectedTile={selectedTile === i}
 							on:click={
 								() => {
-									if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
-									else selectedTile = i
+									if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile, i)
+									else if(!Piece.isType(pawn, Piece.None))selectedTile = i
+									else selectedTile = -1
 								}
 							}
 							on:drop={() => {
-								if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile,i)
+								if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile, i)
 							}}
 							on:dragend={() => selectedTile = -1}
 							on:dragstart={() => selectedTile = i}
 
 							turn={turn}
 
-							debugIndex={i - 27}
+							debugIndex={i}
 						/>
 					{/each}
 
@@ -44,14 +48,18 @@
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/pppppppp/8/pppppppp/RNBQKBNR")
-	// let boardArray = convertFENToBoardArray(startingFEN)
+	// let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/pppppppp/8/pppppppp/RNBQKBNR")
+	let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "W";
 
 	let moveList:Move[] = []
 
 	let selectedTile:number = -1;
+
+	let castlingRights = ["K","Q","k","q"]
+
+	let enPassantTarget:number|null = null
 
 	const generateMoves = () => {
 
@@ -81,10 +89,20 @@
 	$: moveList, console.log("moveList",moveList)
 
 	const executeMove = (startTile:number, targetTile:number) => {
+
+		let pieceToMove = boardArray[startTile]
+
+		enPassantTarget = null;
 		boardArray[targetTile] = boardArray[startTile];
 		boardArray[startTile] = Piece.None;
 		boardArray = boardArray;
+		
+		if(Piece.isType(pieceToMove, Piece.Pawn) && Math.abs(targetTile - startTile) === 16){
+			enPassantTarget = targetTile - (targetTile - startTile)/2
+		}
+		
 		selectedTile = -1;
+
 		turn = turn == "B"?"W":"B"
 	}
 
