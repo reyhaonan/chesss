@@ -91,6 +91,7 @@ export const Piece = {
   Black : 16,
 
   sameColor : (piece:number, color:Color) => {
+    if(piece === Piece.None)return false
         // black                       or  white
     return (piece > 16 && color == "B") || (piece < 16 && color == "W")
   },
