@@ -4,11 +4,11 @@
 	<main class="content col-span-8">
 
 		<div class="w-full flex items-center justify-center my-8">
-
 			<Board>
 				<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
 					{#each boardArray as pawn, i}
 						<Tile pieceNumber={pawn} 
+							highlightLastMove={lastMove.some(e => e === i)}
 							highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
 							highlightSelectedTile={selectedTile === i}
 							on:click={
@@ -31,12 +31,38 @@
 					{/each}
 
 				</div>
+
+				<!-- {#if } -->
+				<div class="absolute top-0 left-0 bg-slate-800/60 inset-0 z-30" class:hidden={!piecePickerIsOpen} slot="picker">
+					<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-20 h-80" style="top:{topOffset}px;left:{leftOffset}px">
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+
+						<button on:click={() => pickPiece(Piece.Queen + Piece[turn])}>
+							<img src={`/pawn_default/${Piece.Queen + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+						</button>
+
+						<button on:click={() => pickPiece(Piece.Knight + Piece[turn])}>
+							<img src={`/pawn_default/${Piece.Knight + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+						</button>
+
+						<button on:click={() => pickPiece(Piece.Rook + Piece[turn])}>
+							<img src={`/pawn_default/${Piece.Rook + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+						</button>
+
+						<button on:click={() => pickPiece(Piece.Bishop + Piece[turn])}>
+							<img src={`/pawn_default/${Piece.Bishop + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+						</button>
+					</div>
+				</div>
+				<!-- {/if} -->
 			</Board>
+	
 		</div>
 	</main>
 	<div class="sidebar col-span-2">b</div>
 </div>
 
+<svelte:window on:beforeunload={() => reject()}/>
 
 <script lang="ts">
 	import Board from "$components/Board.svelte";
@@ -44,21 +70,21 @@
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1")
+	let boardArray = convertFENToBoardArray("rnb1k1nr/ppPp1ppp/1Np1p3/8/8/2P1B3/PPP1bP1P/RNBQK2R w KQkq - 0 6")
 	// let boardArray = convertFENToBoardArray(startingFEN)
 
-	let turn:Color = "W";
+	let turn:Color = "White";
 
 	let moveList:Move[] = []
 
 	let selectedTile:number = -1;
 
 	let castlingRights = {
-		W:{
+		White:{
 			queenSide: true,
 			kingSide: true
 		},
-		B:{
+		Black:{
 			queenSide: true,
 			kingSide: true
 		},
@@ -67,6 +93,12 @@
 	let enPassantTarget:number|null = null
 
 	let futureMoveList: Move[] =[]
+
+	let piecePickerIsOpen = false;
+	let topOffset = 0;
+	let leftOffset = 0;
+
+	let lastMove:number[] = []
 
 	
 	$: boardArray, moveList = generateMoves(boardArray, turn)
@@ -103,30 +135,76 @@
 		return tempMoveList
 	}
 
-	const executeMove = (startTile:number, targetTile:number) => {
+
+	const pickPiece = (pieceNumber: number) => {
+		resolve(pieceNumber);
+		piecePickerIsOpen = false
+	}
+
+	
+	let resolve: (pieceNumber: number) => void;
+	let reject: () => void;
+
+	const openPickerOverlay = (tileNumber:number) => {
+		return new Promise<number>((res, rej) => {
+			piecePickerIsOpen = true
+			topOffset = Piece.getFile(tileNumber) * 80
+			leftOffset = Piece.getRank(tileNumber) * 80;
+
+
+			resolve = res
+			reject = rej
+
+
+		})
+	}
+
+
+	const executeMove = async (startTile:number, targetTile:number) => {
 
 		let pieceToMove = boardArray[startTile]
 
-		let friendlyColor: Color = pieceToMove < 16? "W":"B"
+		let friendlyColor: Color = pieceToMove < 16? "White":"Black"
 
-		let lastEnPassantTarget = enPassantTarget
+		
 
-		enPassantTarget = null;
 
-		boardArray[targetTile] = boardArray[startTile];
-		boardArray[startTile] = Piece.None;
+
+		let enPassantPotential = null
 
 		
 		// Specialized move check
 		if(Piece.isType(pieceToMove, Piece.Pawn)){
+			/* -------------------------------------------------------------------------- */
+			/*                                  Promotion                                 */
+			/* -------------------------------------------------------------------------- */
+			let endOfLine = friendlyColor === "White"? 0 : 7
+			
+			if(Piece.getFile(targetTile) === endOfLine){
+				try{
+					pieceToMove = await openPickerOverlay(targetTile)
+				}catch{
+					// Cancel out movement entirely
+					return 
+				}
+			}
+
+			/* -------------------------------------------------------------------------- */
+			/*                                 En Passant                                 */
+			/* -------------------------------------------------------------------------- */
 			// Set potential en passant target
-			if(Math.abs(targetTile - startTile) === 16)enPassantTarget = targetTile - (targetTile - startTile)/2
+			if(Math.abs(targetTile - startTile) === 16)enPassantPotential = targetTile - (targetTile - startTile)/2
 			// Google en passant
-			else if(targetTile === lastEnPassantTarget) {
-				let holyHell = Piece.sameColor(pieceToMove,"W") ? 8: -8
+			else if(targetTile === enPassantTarget) {
+				let holyHell = Piece.sameColor(pieceToMove,"White") ? 8: -8
 				boardArray[targetTile + holyHell] = Piece.None
 			}
-		}else if(Piece.isType(pieceToMove, Piece.King)){
+		}
+		
+		/* -------------------------------------------------------------------------- */
+		/*                                  Castling                                  */
+		/* -------------------------------------------------------------------------- */
+		else if(Piece.isType(pieceToMove, Piece.King)){
 			// Check if move is kingside castling
 			if(moveList.find(e => e.start === startTile && e.target === targetTile && e.note?.[friendlyColor] === "kingSide")){
 				boardArray[startTile + 1] = boardArray[startTile + 3]; 
@@ -149,11 +227,24 @@
 				}
 			}
 
-		}else if(Piece.isType(pieceToMove, Piece.Rook)){
+		}
+		
+		/* -------------------------------------------------------------------------- */
+		/*                             Castling Invalidate                            */
+		/* -------------------------------------------------------------------------- */
+		else if(Piece.isType(pieceToMove, Piece.Rook)){
 			if(Piece.getRank(startTile) === 7)castlingRights[friendlyColor].kingSide = false
 			else if(Piece.getRank(startTile) === 0)castlingRights[friendlyColor].queenSide = false
 		}
 
+
+		// Execute actual Moves
+		boardArray[targetTile] = pieceToMove;
+		boardArray[startTile] = Piece.None;
+
+		lastMove = [startTile, targetTile]
+
+		enPassantTarget = enPassantPotential ?? null;
 		
 		castlingRights = castlingRights
 
@@ -161,7 +252,7 @@
 		
 		futureMoveList = generateMoves(boardArray, turn)
 		
-		turn = turn == "B" ? "W" : "B"
+		turn = turn == "Black" ? "White" : "Black"
 
 		boardArray = boardArray;
 	}
@@ -169,7 +260,7 @@
 	$: futureMoveList, console.log("futureMovelist", futureMoveList)
 
 	const generateCastlingMove = (tileIndex: number, piece: number, currentBoardArray: number[]):Move[] => {
-  const friendlyColor = piece < 16 ? "W" : "B";
+  const friendlyColor = piece < 16 ? "White" : "Black";
 
   const tempMoveList:Move[] = [];
 
@@ -216,28 +307,27 @@
 
 
 	const generatePawnMove = (tileIndex:number, piece:number, currentBoardArray: number[]):Move[] => {
-		let friendlyColor:Color = piece < 16? "W":"B"
+		let friendlyColor:Color = piece < 16? "White":"Black"
 
 		let tempMoveList:Move[] = []
 		
-		let isOnStartingLine = Piece.sameColor(piece, "W")? Piece.getFile(tileIndex) === 6 : Piece.getFile(tileIndex) === 1
+		let isOnStartingLine = Piece.sameColor(piece, "White")? Piece.getFile(tileIndex) === 6 : Piece.getFile(tileIndex) === 1
 
 		let limit = isOnStartingLine? 2:1
 
-		let pieceTarget = Piece.sameColor(piece, "W")? [4,0,5]:[7,2,6]
+		let pieceTarget = Piece.sameColor(piece, "White")? [4,0,5]:[7,2,6]
 
 		// direction top left, top, top right for white
 		// direction bottom left, bottom , bottom right for black
 		for(let i = 0; i < 3; i++){
 
 			let maxStep = i === 1 ? limit: 1
+
+			console.log("EDGE?", numberOfTilesToEdge[tileIndex], pieceTarget[i])
+			// continue to the next loop if the edge is in the way
+			if(numberOfTilesToEdge[tileIndex][pieceTarget[i]] === 0)continue;
 			
 			for(let step = 1;step <= maxStep;step++){
-
-				// break out of the loop if the edge is in the way
-				if(numberOfTilesToEdge[tileIndex][direction[pieceTarget[i]]] === 0)break;
-
-
 				let targetTile = tileIndex + (direction[pieceTarget[i]] * step)
 				let targetPiece = currentBoardArray[targetTile]
 				
@@ -285,8 +375,8 @@
 
 		let tempMoveList: Move[] = []
 
-		let friendlyColor:Color = piece < 16? "W":"B"
-		let opponentColor:Color = piece < 16? "B":"W"
+		let friendlyColor:Color = piece < 16? "White":"Black"
+		let opponentColor:Color = piece < 16? "Black":"White"
 
 		let startDirectionIndex = Piece.isType(piece, Piece.Bishop)? 4 : 0
 		let endDirectionIndex = Piece.isType(piece, Piece.Rook)? 4 : 8
@@ -325,6 +415,7 @@
 		e.preventDefault();
 		console.log(e)
 	}
+
 
 
 

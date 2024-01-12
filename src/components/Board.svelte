@@ -3,29 +3,31 @@
 
 <div class="grid grid-cols-8 aspect-square border-4 border-neutral-800 relative">
   <!-- Indication row -->
-  <div class="h-full absolute flex flex-col-reverse justify-around right-full top-0 text-neutral-50">
+  <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-semibold">
     {#each Array(8) as num, i}
-      <div class="pr-4">{i + 1}</div>
+      <div class="pl-1">{i + 1}</div>
     {/each}
   </div>
-  <div class="w-full absolute flex justify-around top-full right-0 text-neutral-50">
+  <div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 text-slate-900 font-semibold">
     {#each alphabet as alp, i}
-      <div class="pt-4">{alp}</div>
+      <div class="pb-1 text-right pr-2">{alp}</div>
     {/each}
   </div>
   {#each board as file, i}
     {#each file as tile, j}
-      <div class={`w-20 aspect-square ${(i + j) % 2 == 0?"bg-emerald-100":"bg-emerald-600"}`}></div> 
+      <div class={`w-20 aspect-square ${(i + j) % 2 == 0?"bg-stone-300":"bg-stone-500"}`}></div> 
     {/each}
   {/each}
 
   <slot/>
+
+  <slot name="picker"/>
 </div>
 
 
 
 <script lang="typescript">
-  let alphabet = ["a","b","c","d","e","f"]
+  let alphabet = ["a","b","c","d","e","f","g", "h"]
   // 8x8 2d array
   var board = [...Array(8)].map(e => Array(8));
 </script>

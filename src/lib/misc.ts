@@ -22,4 +22,4 @@ export type Move = {
   note?: any
 }
 
-export type Color = "W"|"B"
+export type Color = "White"|"Black"

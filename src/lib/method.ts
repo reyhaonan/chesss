@@ -70,6 +70,7 @@ const generateNumberOfTilesToEdge = (): number[][] => {
 
 
 
+
 export const numberOfTilesToEdge = generateNumberOfTilesToEdge()
 
 
@@ -93,7 +94,7 @@ export const Piece = {
   sameColor : (piece:number, color:Color) => {
     if(piece === Piece.None)return false
         // black                       or  white
-    return (piece > 16 && color == "B") || (piece < 16 && color == "W")
+    return (piece > 16 && color == "Black") || (piece < 16 && color == "White")
   },
 
   /**

@@ -19,24 +19,40 @@
   {/if}
 
   {#if highlightForMoveSuggestion}
-    <div class="absolute inset-0 bg-red-600/70 flex items-center justify-center">
-      <div class="w-8 bg-red-900/10 rounded-full aspect-square"></div>
+    {#if !!pieceNumber}
+      <div class="w-full border-red-900/30 border-8 rounded-full aspect-square absolute-center"></div>
+    {:else}
+      <div class="w-6 bg-red-900/30 rounded-full aspect-square absolute-center"></div>
+    {/if}
+  {:else if highlightLastMove}
+    <div class="absolute inset-0 bg-amber-500/40">
+      
     </div>
   {/if}
   {#if highlightSelectedTile}
-    <div class="absolute inset-0 bg-amber-500/50"></div>
+    <div class="absolute inset-0 bg-red-900/30"></div>
   {/if}
 
-  <div class="absolute right-0 bottom-0 text-xs">{debugIndex}</div>
+  <!-- <div class="absolute text-center text-red-500">{debugIndex}</div> -->
+
+  <!-- <div class="absolute flex flex-wrap inset-0 justify-around items-stretch text-xs bg-black/20 z-30">
+    {#each numberOfTilesToEdge[debugIndex] as e, i}
+      {#if i === 4}
+      <div class="w-1/3 text-center text-red-500">{debugIndex}</div>
+      {/if}
+      <div class="w-1/3 text-center">{e}</div>
+    {/each}
+  </div> -->
 </div>
 
 <script lang="ts">
-	import { Piece } from "$lib/method";
+	import { Piece, numberOfTilesToEdge } from "$lib/method";
 	import type { Color } from "$lib/misc";
 
   export let pieceNumber:number = 0;
   export let highlightForMoveSuggestion = false
   export let highlightSelectedTile = false
+  export let highlightLastMove = false
 
   export let debugIndex:number
 
