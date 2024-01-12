@@ -44,7 +44,7 @@
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1")
+	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RN2K1NR w KQkq - 0 1")
 	// let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "W";
@@ -74,7 +74,7 @@
 	$: moveList, console.log("moveList",moveList)
 
 
-	const generateMoves = (currentBoardArray: number[], currentTurn: Color) => {
+	const generateMoves = (currentBoardArray: number[], currentTurn: Color):Move[] => {
 
 		let tempMoveList:Move[] = []
 		
@@ -116,6 +116,8 @@
 		boardArray[targetTile] = boardArray[startTile];
 		boardArray[startTile] = Piece.None;
 
+		
+		// Specialized move check
 		if(Piece.isType(pieceToMove, Piece.Pawn)){
 			// Set potential en passant target
 			if(Math.abs(targetTile - startTile) === 16)enPassantTarget = targetTile - (targetTile - startTile)/2
@@ -125,17 +127,34 @@
 				boardArray[targetTile + holyHell] = Piece.None
 			}
 		}else if(Piece.isType(pieceToMove, Piece.King)){
+			// Check if move is kingside castling
 			if(moveList.find(e => e.start === startTile && e.target === targetTile && e.note?.[friendlyColor] === "kingSide")){
-				boardArray[targetTile] = pieceToMove; 
 				boardArray[startTile + 1] = boardArray[startTile + 3]; 
-				boardArray[startTile + 3] = Piece.None; 
+				boardArray[startTile + 3] = Piece.None;
+
+				castlingRights[friendlyColor].kingSide = false
 			}
+			// Check if move is queenside castling
+			else if(moveList.find(e => e.start === startTile && e.target === targetTile && e.note?.[friendlyColor] === "queenSide")){
+				boardArray[startTile - 1] = boardArray[startTile - 4]; 
+				boardArray[startTile - 4] = Piece.None;
+
+				castlingRights[friendlyColor].queenSide = false
+			}
+			// Neither? then provoke all castling side
+			else {
+				castlingRights[friendlyColor] = {
+					kingSide: false,
+					queenSide: false,
+				}
+			}
+
+			castlingRights = castlingRights
+		}else if(Piece.isType(pieceToMove, Piece.Rook)){
+
 		}
 
-		
 		selectedTile = -1;
-		
-		
 		
 		futureMoveList = generateMoves(boardArray, turn)
 		
@@ -144,51 +163,55 @@
 		boardArray = boardArray;
 	}
 
-	const generateCastlingMove = (tileIndex:number, piece:number, currentBoardArray: number[]) => {
-		let friendlyColor:Color = piece < 16? "W":"B"
+	$: futureMoveList, console.log("futureMovelist", futureMoveList)
 
-		
-		let tempMoveList: Move[] = []
+	const generateCastlingMove = (tileIndex: number, piece: number, currentBoardArray: number[]):Move[] => {
+  const friendlyColor = piece < 16 ? "W" : "B";
 
-		// Kingside castling checks
-		if(castlingRights[friendlyColor].kingSide){
+  const tempMoveList:Move[] = [];
+
+	let castlingSide = [["kingSide", 1],["queenSide", -1]]
+
+  // Combine kingside and queenside checks for efficiency
+  for (const [side, direction] of castlingSide) {
+		//@ts-ignore
+    if (castlingRights[friendlyColor][side]) {
 			let isValid = true;
+      for (let i = 0; i < (side === "kingSide" ? 4 : 5) && isValid; i++) {
+				//@ts-ignore
+        const offset = i * direction;
 
-			// Pre-calculate target tiles for efficiency
-			
+        // Check for targeted squares
+        if (i < 3) {
+          isValid = isValid && !futureMoveList.some((e) => e.target === tileIndex + offset);
+        }
 
-			// Check for obstacles or attacks in a single loop
-			for (let i = 0; i < 4 && isValid; i++) {
-				if(i < 3)console.log("AYAYA",futureMoveList, futureMoveList.some(e => e.target === tileIndex + i))
-				// king and adjacent two space is not targetted
-				if(i < 3)isValid = isValid && !futureMoveList.some(e => e.target === tileIndex + i)
+        // Check for empty squares and correct rook
+        if (i >= 1 && i < 4) {
+          isValid = isValid && currentBoardArray[tileIndex + offset] === Piece.None;
+        } else if (i === 4) {
+          isValid = isValid &&
+            Piece.isType(currentBoardArray[tileIndex + offset], Piece.Rook) &&
+            Piece.sameColor(currentBoardArray[tileIndex + offset], friendlyColor);
+        }
+      }
 
-				// adjacent two space is empty
-				if(i === 1 || i === 2)isValid = isValid && currentBoardArray[tileIndex + i] === Piece.None;
+      if (isValid) {
+				tempMoveList.push({
+					start: tileIndex,
+					//@ts-ignore
+          target: tileIndex + 2 * direction,
+          note: { [friendlyColor]: side },
+        });
+      }
+    }
+  }
 
-				if(i === 3)isValid = isValid &&
-									Piece.isType(currentBoardArray[tileIndex + i], Piece.Rook) &&
-									Piece.sameColor(currentBoardArray[tileIndex + i], friendlyColor);
-				// isValid = isValid &&
-				// 					Piece.isType(targetTiles[3], Piece.Rook) &&
-				// 					Piece.sameColor(targetTiles[3], friendlyColor);
-			}
-			if (isValid) {
-				tempMoveList.push({ start: tileIndex, target: tileIndex + 2, note: {
-					[friendlyColor]: "kingSide"
-				} });
-			}
+  return tempMoveList;
+};
 
-		// Queenside castling checks
-		}else if(castlingRights[friendlyColor].queenSide){
 
-		}
-
-		return tempMoveList
-
-	}
-
-	const generatePawnMove = (tileIndex:number, piece:number, currentBoardArray: number[]) => {
+	const generatePawnMove = (tileIndex:number, piece:number, currentBoardArray: number[]):Move[] => {
 		let friendlyColor:Color = piece < 16? "W":"B"
 
 		let tempMoveList:Move[] = []
@@ -229,7 +252,7 @@
 		return tempMoveList
 	}
 
-	const generateKnightMove = (tileIndex: number, currentBoardArray: number[]) => {
+	const generateKnightMove = (tileIndex: number, currentBoardArray: number[]):Move[] => {
 		const knightMoveOffsets = [
 			-17, -15, -6, 10, 17, 15, 6, -10
 		];
@@ -254,7 +277,7 @@
 	};
 
 
-	const generateSlidingMove = (tileIndex: number, piece:number, currentBoardArray: number[]) => {
+	const generateSlidingMove = (tileIndex: number, piece:number, currentBoardArray: number[]):Move[] => {
 
 		let tempMoveList: Move[] = []
 
