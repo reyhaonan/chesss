@@ -198,7 +198,7 @@
 
 		lastMove = [startTile, targetTile]
 
-		enPassantTarget = enPassantPotential ?? null;
+		enPassantTarget = enPassantPotential;
 
 		selectedTile = -1;
 
