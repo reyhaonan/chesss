@@ -1,7 +1,7 @@
 
 <!-- Graphical only -->
 
-<div class="grid grid-cols-8 aspect-square border-4 border-neutral-800 relative">
+<div class="grid grid-cols-8 aspect-square rounded-md overflow-hidden border-neutral-800 relative">
   <!-- Indication row -->
   <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-semibold">
     {#each Array(8) as num, i}

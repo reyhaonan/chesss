@@ -1,66 +1,57 @@
 
-<div class="grid grid-cols-12">
-	<div class="sidebar col-span-2">a</div>
-	<main class="content col-span-8">
+<Board>
+	<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
+		{#each boardArray as pawn, i}
+			<Tile pieceNumber={pawn} 
+				highlightLastMove={lastMove.some(e => e === i)}
+				highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
+				highlightSelectedTile={selectedTile === i}
+				on:click={
+					() => {
+						if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile, i)
+						else if(!Piece.isType(pawn, Piece.None))selectedTile = i
+						else selectedTile = -1
+					}
+				}
+				on:drop={() => {
+					if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile, i)
+				}}
+				on:dragend={() => selectedTile = -1}
+				on:dragstart={() => selectedTile = i}
 
-		<div class="w-full flex items-center justify-center my-8">
-			<Board>
-				<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
-					{#each boardArray as pawn, i}
-						<Tile pieceNumber={pawn} 
-							highlightLastMove={lastMove.some(e => e === i)}
-							highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
-							highlightSelectedTile={selectedTile === i}
-							on:click={
-								() => {
-									if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile, i)
-									else if(!Piece.isType(pawn, Piece.None))selectedTile = i
-									else selectedTile = -1
-								}
-							}
-							on:drop={() => {
-								if(!!moveList.find(move => move.start === selectedTile && move.target === i))executeMove(selectedTile, i)
-							}}
-							on:dragend={() => selectedTile = -1}
-							on:dragstart={() => selectedTile = i}
+				turn={turn}
 
-							turn={turn}
+				debugIndex={i}
+			/>
+		{/each}
 
-							debugIndex={i}
-						/>
-					{/each}
+	</div>
 
-				</div>
+	<!-- {#if } -->
+	<div class="absolute top-0 left-0 bg-slate-800/60 inset-0 z-30" class:hidden={!piecePickerIsOpen} slot="picker">
+		<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-20 h-80" style="top:{topOffset}px;left:{leftOffset}px">
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 
-				<!-- {#if } -->
-				<div class="absolute top-0 left-0 bg-slate-800/60 inset-0 z-30" class:hidden={!piecePickerIsOpen} slot="picker">
-					<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-20 h-80" style="top:{topOffset}px;left:{leftOffset}px">
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<button on:click={() => pickPiece(Piece.Queen + Piece[turn])}>
+				<img src={`/pawn_default/${Piece.Queen + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			</button>
 
-						<button on:click={() => pickPiece(Piece.Queen + Piece[turn])}>
-							<img src={`/pawn_default/${Piece.Queen + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-						</button>
+			<button on:click={() => pickPiece(Piece.Knight + Piece[turn])}>
+				<img src={`/pawn_default/${Piece.Knight + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			</button>
 
-						<button on:click={() => pickPiece(Piece.Knight + Piece[turn])}>
-							<img src={`/pawn_default/${Piece.Knight + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-						</button>
+			<button on:click={() => pickPiece(Piece.Rook + Piece[turn])}>
+				<img src={`/pawn_default/${Piece.Rook + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			</button>
 
-						<button on:click={() => pickPiece(Piece.Rook + Piece[turn])}>
-							<img src={`/pawn_default/${Piece.Rook + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-						</button>
-
-						<button on:click={() => pickPiece(Piece.Bishop + Piece[turn])}>
-							<img src={`/pawn_default/${Piece.Bishop + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-						</button>
-					</div>
-				</div>
-				<!-- {/if} -->
-			</Board>
-	
+			<button on:click={() => pickPiece(Piece.Bishop + Piece[turn])}>
+				<img src={`/pawn_default/${Piece.Bishop + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			</button>
 		</div>
-	</main>
-	<div class="sidebar col-span-2">b</div>
-</div>
+	</div>
+	<!-- {/if} -->
+</Board>
+
 
 <svelte:window on:beforeunload={() => reject()}/>
 
