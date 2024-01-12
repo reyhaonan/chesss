@@ -33,7 +33,7 @@
     <div class="absolute inset-0 bg-red-900/30"></div>
   {/if}
 
-  <div class="absolute text-left text-red-500 z-50">{debugIndex - 27}</div>
+  <!-- <div class="absolute text-left text-red-500 z-50">{debugIndex - 27}</div> -->
 
   <!-- <div class="absolute flex flex-wrap inset-0 justify-around items-stretch text-xs bg-black/20 z-30">
     {#each numberOfTilesToEdge[debugIndex] as e, i}
