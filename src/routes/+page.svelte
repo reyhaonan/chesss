@@ -44,7 +44,7 @@
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RN2K1NR w KQkq - 0 1")
+	let boardArray = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1")
 	// let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "W";
@@ -149,10 +149,13 @@
 				}
 			}
 
-			castlingRights = castlingRights
 		}else if(Piece.isType(pieceToMove, Piece.Rook)){
-
+			if(Piece.getRank(startTile) === 7)castlingRights[friendlyColor].kingSide = false
+			else if(Piece.getRank(startTile) === 0)castlingRights[friendlyColor].queenSide = false
 		}
+
+		
+		castlingRights = castlingRights
 
 		selectedTile = -1;
 		
@@ -170,26 +173,27 @@
 
   const tempMoveList:Move[] = [];
 
-	let castlingSide = [["kingSide", 1],["queenSide", -1]]
+	let castlingSide:["queenSide"|"kingSide", number, number][] = [["kingSide", 1, 3],["queenSide", -1, 4]]
 
   // Combine kingside and queenside checks for efficiency
-  for (const [side, direction] of castlingSide) {
-		//@ts-ignore
+  for (const [side, direction, rookOffset] of castlingSide) {
     if (castlingRights[friendlyColor][side]) {
 			let isValid = true;
-      for (let i = 0; i < (side === "kingSide" ? 4 : 5) && isValid; i++) {
-				//@ts-ignore
+
+      for (let i = 0; i < rookOffset + 1 && isValid; i++) {
+	
         const offset = i * direction;
 
+	
         // Check for targeted squares
-        if (i < 3) {
+        if (i < rookOffset) {
           isValid = isValid && !futureMoveList.some((e) => e.target === tileIndex + offset);
         }
-
+	
         // Check for empty squares and correct rook
-        if (i >= 1 && i < 4) {
+        if (i > 0 && i < rookOffset) {
           isValid = isValid && currentBoardArray[tileIndex + offset] === Piece.None;
-        } else if (i === 4) {
+        } else if (i === rookOffset) {
           isValid = isValid &&
             Piece.isType(currentBoardArray[tileIndex + offset], Piece.Rook) &&
             Piece.sameColor(currentBoardArray[tileIndex + offset], friendlyColor);
@@ -199,7 +203,7 @@
       if (isValid) {
 				tempMoveList.push({
 					start: tileIndex,
-					//@ts-ignore
+		
           target: tileIndex + 2 * direction,
           note: { [friendlyColor]: side },
         });
