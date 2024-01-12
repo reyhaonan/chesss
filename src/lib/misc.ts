@@ -23,3 +23,15 @@ export type Move = {
 }
 
 export type Color = "White"|"Black"
+
+
+export type CastlingRightsType = {
+  White:{
+    queenSide: boolean,
+    kingSide: boolean
+  },
+  Black:{
+    queenSide: boolean,
+    kingSide: boolean
+  },
+}
