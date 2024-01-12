@@ -132,12 +132,14 @@
 			}
 		}
 
+		
+		// TODO: Buggy af
 		// Filter out movement that would result in king getting targetted
 		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 			let {newBoardArray, newCastlingRights} = executeMove([...currentBoardArray], move.start, move.target, currentCastlingRights)
 			// return true
 
-			return !generateMoves([...newBoardArray], nextTurn, newCastlingRights, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King))
+			return !generateMoves([...newBoardArray], nextTurn, Object.assign({} ,newCastlingRights), --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target],currentTurn))
 		})
 		
 
