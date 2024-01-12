@@ -18,7 +18,8 @@ export const direction = [
 
 export type Move = {
   start:number;
-  target:number
+  target:number;
+  note?: any
 }
 
 export type Color = "W"|"B"
