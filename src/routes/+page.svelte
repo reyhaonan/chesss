@@ -50,8 +50,7 @@
 		</div>
 	</div>
 
-	<div class="absolute top-full">
-		{JSON.stringify(castlingRights)}	</div>
+	<div class="absolute top-full"><button on:click={moveRandomly}>MOVE {turn}</button></div>
 	<!-- {/if} -->
 </Board>
 
@@ -64,8 +63,8 @@
 	import { convertFENToBoardArray, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
-	// let boardArray = convertFENToBoardArray("rnb1k1nr/ppPp1ppp/1Np1p3/8/8/2P1B3/PPP1bP1P/RNBQK2R w KQkq - 0 6")
-	let boardArray = convertFENToBoardArray(startingFEN)
+	let boardArray = convertFENToBoardArray("rnb1k1nr/ppPp1ppp/1Np1p3/N7/8/2P1B3/PPP1bP1P/RNBQK2R w KQkq - 0 6")
+	// let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
 
@@ -103,6 +102,16 @@
 	$: moveList, console.log("moveList", moveList)
 	$: if(moveList.length === 0)alert(turn + " is lost");
 
+	// $: turn, boardArray, moveList, moveRandomly()
+
+
+
+	const moveRandomly = () => {
+		let selectedMove = moveList[Math.floor(Math.random() * moveList.length)]
+
+		console.log("executed", selectedMove.start, selectedMove.target)
+		move(selectedMove.start, selectedMove.target)
+	}
 
 
 	const generateMoves = (currentBoardArray: number[], currentTurn: Color, currentCastlingRights: CastlingRightsType, currentFutureMoveList: Move[], currentEnPassantTarget:number|null, futureCheck:number):Move[] => {

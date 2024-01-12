@@ -223,6 +223,7 @@ export const generatePawnMove = (
 	return tempMoveList;
 };
 
+// fix this
 export const generateKnightMove = (
 	tileIndex: number,
 	piece: number,
