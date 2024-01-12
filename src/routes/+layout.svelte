@@ -2,7 +2,7 @@
   import "$lib/app.css";
 </script>
 
-<div class="grid grid-cols-12">
+<div class="grid grid-cols-12 h-screen">
 	<div class="sidebar col-span-2">a</div>
 	<main class="content col-span-8">
 

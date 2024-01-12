@@ -64,8 +64,8 @@
 	import { convertFENToBoardArray, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("rnb1k1nr/ppPp1ppp/1Np1p3/8/8/2P1B3/PPP1bP1P/RNBQK2R w KQkq - 0 6")
-	// let boardArray = convertFENToBoardArray(startingFEN)
+	// let boardArray = convertFENToBoardArray("rnb1k1nr/ppPp1ppp/1Np1p3/8/8/2P1B3/PPP1bP1P/RNBQK2R w KQkq - 0 6")
+	let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
 
@@ -99,12 +99,16 @@
 	
 	$: boardArray, futureMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", Object.assign({}, castlingRights), 0), moveList =  generateMoves([...boardArray], turn, {...castlingRights}, 1)
 
-	$: moveList, console.log("moveList",moveList)
+	$: moveList, console.log("moveList", moveList)
+	$: if(moveList.length === 0)alert(turn + " is lost");
+
 
 
 	const generateMoves = (currentBoardArray: number[], currentTurn: Color, currentCastlingRights: CastlingRightsType, futureCheck:number):Move[] => {
 
 		let tempMoveList:Move[] = []
+
+		let nextTurn:Color = currentTurn === "White" ? "Black" : "White"
 		
 		for(let i = 0;i < 64;i++){
 			let piece = currentBoardArray[i];
@@ -132,7 +136,8 @@
 		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 			let {newBoardArray, newCastlingRights} = executeMove([...currentBoardArray], move.start, move.target, currentCastlingRights)
 			// return true
-			return !generateMoves([...newBoardArray], currentTurn === "White" ? "Black" : "White", newCastlingRights, futureCheck - 1).some(move => Piece.isType(newBoardArray[move.target], Piece.King))
+
+			return !generateMoves([...newBoardArray], nextTurn, newCastlingRights, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King))
 		})
 		
 
