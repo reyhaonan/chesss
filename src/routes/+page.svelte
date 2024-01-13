@@ -66,7 +66,7 @@
 <script lang="ts">
 	import Board from "$components/Board.svelte";
 	import Tile from "$components/Tile.svelte";
-	import { convertFENToBoardArray, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
+	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
 	// let boardArray = convertFENToBoardArray("r1b1k2r/ppPp1ppp/N1p1p3/8/8/2P1B3/PPP1bP1P/R1BQK2R w KQkq - 0 6")
@@ -154,7 +154,7 @@
 		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 			// return true
 			
-			let {newBoardArray, newCastlingRights, enPassantPotential} = executeMove([...currentBoardArray], move.start, move.target, move.note, {...currentCastlingRights}, false)
+			let {newBoardArray, newCastlingRights, enPassantPotential} = executeMove([...currentBoardArray], move.start, move.target, move.note, {...currentCastlingRights}, currentEnPassantTarget, false)
 			// console.log("WHAT THE HELL", move, generateMoves([...newBoardArray], nextTurn, newCastlingRights, --futureCheck))
 			return !generateMoves([...newBoardArray], nextTurn, {...newCastlingRights}, currentFutureMoveList, enPassantPotential, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
 		})
@@ -191,6 +191,8 @@
 	
 
 	const move = async (startTile:number, targetTile:number, note: any) => {
+
+		console.log("MOVED ONCE")
 		
 		let friendlyColor: Color = boardArray[selectedTile] < 16? "White":"Black"
 		/* -------------------------------------------------------------------------- */
@@ -209,7 +211,7 @@
 			}
 		}
 
-		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove(boardArray, startTile, targetTile, note, castlingRights, true, pickedPiece )
+		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove(boardArray, startTile, targetTile, note, castlingRights, enPassantTarget, true, pickedPiece )
 
 		lastMove = [startTile, targetTile]
 
@@ -224,95 +226,6 @@
 		boardArray = newBoardArray;
 	}
 
-
-	type BoardInfo = {
-		newBoardArray:number[],
-		enPassantPotential:number|null
-		newCastlingRights:CastlingRightsType
-	}
-
-	const executeMove = (currentBoardArray:number[], startTile:number, targetTile:number, note:any, currentCastlingRights:CastlingRightsType, includeSideEffect:boolean,pickedPiece?:number):BoardInfo => {
-
-		let pieceToMove = currentBoardArray[startTile]
-
-		let friendlyColor: Color = pieceToMove < 16? "White":"Black"
-		let opponentColor: Color = pieceToMove < 16? "Black":"White"
-
-		let targetPiece = currentBoardArray[targetTile]
-
-		let enPassantPotential = null
-
-		// if(includeSideEffect){
-			// Specialized move check
-			if(Piece.isType(pieceToMove, Piece.Pawn)){
-	
-				if(pickedPiece)pieceToMove = pickedPiece
-	
-				/* -------------------------------------------------------------------------- */
-				/*                                 En Passant                                 */
-				/* -------------------------------------------------------------------------- */
-				// Set potential en passant target
-				if(Math.abs(targetTile - startTile) === 16)enPassantPotential = targetTile - (targetTile - startTile)/2
-				// Google en passant
-				else if(targetTile === enPassantTarget) {
-					let holyHell = Piece.sameColor(pieceToMove,"White") ? 8: -8
-					currentBoardArray[targetTile + holyHell] = Piece.None
-				}
-			}
-			/* -------------------------------------------------------------------------- */
-			/*                                  Castling                                  */
-			/* -------------------------------------------------------------------------- */
-			else if(Piece.isType(pieceToMove, Piece.King)){
-				// Check if move is kingside castling
-				if(note?.[friendlyColor] === "kingSide"){
-					currentBoardArray[startTile + 1] = currentBoardArray[startTile + 3]; 
-					currentBoardArray[startTile + 3] = Piece.None;
-	
-					currentCastlingRights[friendlyColor].kingSide = false
-				}
-				// Check if move is queenside castling
-				else if(note?.[friendlyColor] === "queenSide"){
-					currentBoardArray[startTile - 1] = currentBoardArray[startTile - 4]; 
-					currentBoardArray[startTile - 4] = Piece.None;
-	
-					currentCastlingRights[friendlyColor].queenSide = false
-				}
-				// Neither? then provoke all castling side
-				else {
-					currentCastlingRights[friendlyColor] = {
-						queenSide: false,
-						kingSide: false,
-					}
-				}
-	
-			}
-	
-	
-			/* -------------------------------------------------------------------------- */
-			/*                             Castling Invalidate                            */
-			/* -------------------------------------------------------------------------- */
-			else if(Piece.isType(pieceToMove, Piece.Rook)){
-				if(Piece.getRank(startTile) === 7)currentCastlingRights[friendlyColor].kingSide = false
-				else if(Piece.getRank(startTile) === 0)currentCastlingRights[friendlyColor].queenSide = false
-			}
-			
-			
-
-			// Taking rook castle so revoke the rights
-			if(Piece.isType(targetPiece, Piece.Rook)){
-				if(Piece.getRank(targetTile) === 7)currentCastlingRights[opponentColor].kingSide = false
-				else if(Piece.getRank(targetTile) === 0)currentCastlingRights[opponentColor].queenSide = false
-			}
-		// }
-
-
-
-		// Execute actual Moves
-		currentBoardArray[targetTile] = pieceToMove;
-		currentBoardArray[startTile] = Piece.None;
-
-		return {newBoardArray: currentBoardArray, enPassantPotential, newCastlingRights: currentCastlingRights}
-	}
 
 
 	$: futureMoveList, console.log("futureMovelist", futureMoveList)
