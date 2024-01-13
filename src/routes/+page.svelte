@@ -121,7 +121,14 @@
 	}
 
 
-	const generateMoves = (currentBoardArray: number[], currentTurn: Color, currentCastlingRights: CastlingRightsType, currentFutureMoveList: Move[], currentEnPassantTarget:number|null, futureCheck:number):Move[] => {
+	const generateMoves = (
+			currentBoardArray: number[], 
+			currentTurn: Color, 
+			currentCastlingRights: CastlingRightsType, 
+			currentFutureMoveList: Move[], 
+			currentEnPassantTarget:number|null, 
+			futureCheck:number
+		) : Move[] => {
 
 		let tempMoveList:Move[] = []
 
@@ -149,21 +156,33 @@
 			}
 		}
 
+		let legalMove: Move[] = []
 		
 		// Filter out movement that would result in king getting targetted
-		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
-			// return true
-			// TODO: Buggy af
-			let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget, false)
-			// console.log("surprise too", newCastlingRights)
-			// console.log("WHAT THE HELL", move, generateMoves([...newBoardArray], nextTurn, newCastlingRights, --futureCheck))
-			return !generateMoves([...newBoardArray], nextTurn, {...newCastlingRights}, currentFutureMoveList, enPassantPotential, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
-		})
+		if(futureCheck > 0){
 
-		tempMoveList = tempMoveList.filter(move => move.target >= 0 && move.target < 64)
+
+			// "Execute" this move to show what the board looks like after this move
+			
+			for(let i = 0; i < tempMoveList.length;i++){
+				let move = tempMoveList[i]
+
+				let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget, true);
+				
+				let hasAPieceThatWillAttackKing = generateMoves([...newBoardArray], nextTurn, {...newCastlingRights}, [...currentFutureMoveList], enPassantPotential, --futureCheck)
+					.some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
+
+				if(!hasAPieceThatWillAttackKing && move.target >= 0 && move.target < 64)legalMove.push(move)
+			}
+			
+		}
+		
+		// executeMove([...currentBoardArray], tempMoveList.find(e => e.target === 7)?? tempMoveList[0], {...currentCastlingRights}, currentEnPassantTarget, true)
 		
 
-		return tempMoveList
+		
+
+		return legalMove
 	}
 
 
@@ -218,7 +237,7 @@
 
 		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove(boardArray, move, castlingRights, enPassantTarget, true, pickedPiece )
 
-		// console.log("surprise ", newCastlingRights)
+		console.log("surprise ", newCastlingRights)
 
 		lastMove = [startTile, targetTile]
 

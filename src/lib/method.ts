@@ -260,12 +260,6 @@ export const generateKnightMove = (
 	for (let i = 0; i < knightMoveOffsets.length; i++) {
 		const targetTile = tileIndex + knightMoveOffsets[i];
 		// Ensure the target tile is within bounds
-		console.log(
-			'check',
-			knightMoveOffsets[i],
-			knightNumberOfTilesToEdge[i],
-			numberOfTilesToEdge[tileIndex]
-		);
 		if (knightNumberOfTilesToEdge[i][0] >= 2 && knightNumberOfTilesToEdge[i][1] >= 1) {
 			const targetPiece = currentBoardArray[targetTile];
 			// Knight can jump over pieces, so only check for friendly pieces
@@ -335,8 +329,6 @@ export const executeMove = (
 	includeCastlingSideEffect: boolean,
 	pickedPiece?: number
 ): BoardInfo => {
-	includeCastlingSideEffect = true;
-
 	let { start: startTile, target: targetTile, note } = move;
 
 	let pieceToMove = currentBoardArray[startTile];
