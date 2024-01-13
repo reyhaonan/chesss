@@ -63,8 +63,8 @@
 	import { convertFENToBoardArray, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("rnb1k1nr/ppPp1ppp/1Np1p3/N7/8/2P1B3/PPP1bP1P/RNBQK2R w KQkq - 0 6")
-	// let boardArray = convertFENToBoardArray(startingFEN)
+	// let boardArray = convertFENToBoardArray("r1b1k2r/ppPp1ppp/N1p1p3/8/8/2P1B3/PPP1bP1P/R1BQK2R w KQkq - 0 6")
+	let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
 

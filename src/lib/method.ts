@@ -229,7 +229,29 @@ export const generateKnightMove = (
 	piece: number,
 	currentBoardArray: number[]
 ): Move[] => {
-	const knightMoveOffsets = [-17, -15, -6, 10, 17, 15, 6, -10];
+	// -17: 2 north, 1 west, 0 ,3
+	// -15: 2 north, 1 east, 0, 1
+	// -10: 2 west, 1 north, 3, 0
+	// -6: 2 east, 1 north, 1, 0
+	// 6: 2 west, 1 south, 3, 2
+	// 10: 2 east, 1 south, 1, 2
+	// 15: 2 south, 1 west, 2, 3
+	// 17: 2 south, 1 east,	2, 1
+
+	let d = numberOfTilesToEdge[tileIndex];
+
+	const knightNumberOfTilesToEdge = [
+		[d[0], d[3]],
+		[d[0], d[1]],
+		[d[3], d[0]],
+		[d[1], d[0]],
+		[d[3], d[2]],
+		[d[1], d[2]],
+		[d[2], d[3]],
+		[d[2], d[1]]
+	];
+
+	const knightMoveOffsets = [-17, -15, -10, -6, 6, 10, 15, 17];
 
 	let tempMoveList: Move[] = [];
 
@@ -237,11 +259,15 @@ export const generateKnightMove = (
 
 	for (let i = 0; i < knightMoveOffsets.length; i++) {
 		const targetTile = tileIndex + knightMoveOffsets[i];
-
 		// Ensure the target tile is within bounds
-		if (numberOfTilesToEdge[tileIndex][Math.floor(i / 2)] >= 2) {
+		console.log(
+			'check',
+			knightMoveOffsets[i],
+			knightNumberOfTilesToEdge[i],
+			numberOfTilesToEdge[tileIndex]
+		);
+		if (knightNumberOfTilesToEdge[i][0] >= 2 && knightNumberOfTilesToEdge[i][1] >= 1) {
 			const targetPiece = currentBoardArray[targetTile];
-
 			// Knight can jump over pieces, so only check for friendly pieces
 			if (!Piece.sameColor(targetPiece, friendlyColor)) {
 				tempMoveList.push({ start: tileIndex, target: targetTile });
