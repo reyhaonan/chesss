@@ -57,6 +57,8 @@
 </Board>
 
 
+<!-- TODO: 50 move rule, draw -->
+
 <svelte:window on:beforeunload={() => reject()}/>
 
 <script lang="ts">
