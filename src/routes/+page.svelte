@@ -9,14 +9,14 @@
 				on:click={
 					() => {
 						let moveToUse = moveList.find(move => move.start === selectedTile && move.target === i)
-						if(!!moveToUse)move(selectedTile, i, moveToUse.note)
+						if(!!moveToUse)move(moveToUse)
 						else if(!Piece.isType(pawn, Piece.None))selectedTile = i
 						else selectedTile = -1
 					}
 				}
 				on:drop={() => {
 					let moveToUse = moveList.find(move => move.start === selectedTile && move.target === i)
-					if(!!moveToUse)move(selectedTile, i, moveToUse.note)
+					if(!!moveToUse)move(moveToUse)
 				}}
 				on:dragend={() => selectedTile = -1}
 				on:dragstart={() => selectedTile = i}
@@ -69,7 +69,7 @@
 	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
-	// let boardArray = convertFENToBoardArray("r1b1k2r/ppPp1ppp/N1p1p3/8/8/2P1B3/PPP1bP1P/R1BQK2R w KQkq - 0 6")
+	// let boardArray = convertFENToBoardArray("8/8/8/2k5/2pP4/8/B7/4K3 b - d3 0 3")
 	let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
@@ -100,9 +100,10 @@
 	let leftOffset = 0;
 
 	let lastMove:number[] = []
+	
 
 	
-	$: boardArray, futureMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", {...castlingRights}, [], enPassantTarget, 0)
+	$: boardArray, futureMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", {...castlingRights}, [], enPassantTarget, 1)
 	$: futureMoveList, moveList =  generateMoves([...boardArray], turn, {...castlingRights}, futureMoveList, enPassantTarget, 1)
 
 	$: moveList, console.log("moveList", moveList)
@@ -116,7 +117,7 @@
 		let selectedMove = moveList[Math.floor(Math.random() * moveList.length)]
 
 		console.log("executed", selectedMove.start, selectedMove.target)
-		move(selectedMove.start, selectedMove.target, selectedMove.note)
+		move(selectedMove)
 	}
 
 
@@ -153,7 +154,7 @@
 		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 			// return true
 			// TODO: Buggy af
-			let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move.start, move.target, move.note, {...currentCastlingRights}, currentEnPassantTarget, false)
+			let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget, false)
 			// console.log("surprise too", newCastlingRights)
 			// console.log("WHAT THE HELL", move, generateMoves([...newBoardArray], nextTurn, newCastlingRights, --futureCheck))
 			return !generateMoves([...newBoardArray], nextTurn, {...newCastlingRights}, currentFutureMoveList, enPassantPotential, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
@@ -190,7 +191,11 @@
 	}
 	
 
-	const move = async (startTile:number, targetTile:number, note: any) => {
+	// Move fn
+	const move = async (move: Move) => {
+
+		
+		let {start: startTile, target: targetTile, note} = move
 
 		console.log("MOVED ONCE")
 		
@@ -211,7 +216,7 @@
 			}
 		}
 
-		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove(boardArray, startTile, targetTile, note, castlingRights, enPassantTarget, true, pickedPiece )
+		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove(boardArray, move, castlingRights, enPassantTarget, true, pickedPiece )
 
 		// console.log("surprise ", newCastlingRights)
 

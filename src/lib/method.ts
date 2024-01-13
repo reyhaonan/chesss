@@ -329,14 +329,16 @@ type BoardInfo = {
 
 export const executeMove = (
 	currentBoardArray: number[],
-	startTile: number,
-	targetTile: number,
-	note: any,
+	move: Move,
 	currentCastlingRights: CastlingRightsType,
 	currentEnPassantTarget: number | null,
 	includeCastlingSideEffect: boolean,
 	pickedPiece?: number
 ): BoardInfo => {
+	includeCastlingSideEffect = true;
+
+	let { start: startTile, target: targetTile, note } = move;
+
 	let pieceToMove = currentBoardArray[startTile];
 
 	let friendlyColor: Color = pieceToMove < 16 ? 'White' : 'Black';
