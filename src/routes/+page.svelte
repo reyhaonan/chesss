@@ -149,12 +149,12 @@
 		}
 
 		
-		// TODO: Buggy af
 		// Filter out movement that would result in king getting targetted
 		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 			// return true
-			
-			let {newBoardArray, newCastlingRights, enPassantPotential} = executeMove([...currentBoardArray], move.start, move.target, move.note, {...currentCastlingRights}, currentEnPassantTarget, false)
+			// TODO: Buggy af
+			let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move.start, move.target, move.note, {...currentCastlingRights}, currentEnPassantTarget, false)
+			// console.log("surprise too", newCastlingRights)
 			// console.log("WHAT THE HELL", move, generateMoves([...newBoardArray], nextTurn, newCastlingRights, --futureCheck))
 			return !generateMoves([...newBoardArray], nextTurn, {...newCastlingRights}, currentFutureMoveList, enPassantPotential, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
 		})
@@ -212,6 +212,8 @@
 		}
 
 		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove(boardArray, startTile, targetTile, note, castlingRights, enPassantTarget, true, pickedPiece )
+
+		// console.log("surprise ", newCastlingRights)
 
 		lastMove = [startTile, targetTile]
 

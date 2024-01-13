@@ -334,7 +334,7 @@ export const executeMove = (
 	note: any,
 	currentCastlingRights: CastlingRightsType,
 	currentEnPassantTarget: number | null,
-	includeSideEffect: boolean,
+	includeCastlingSideEffect: boolean,
 	pickedPiece?: number
 ): BoardInfo => {
 	let pieceToMove = currentBoardArray[startTile];
@@ -346,62 +346,60 @@ export const executeMove = (
 
 	let enPassantPotential = null;
 
-	if (includeSideEffect || true) {
-		// Specialized move check
-		if (Piece.isType(pieceToMove, Piece.Pawn)) {
-			if (pickedPiece) pieceToMove = pickedPiece;
+	// Specialized move check
+	if (Piece.isType(pieceToMove, Piece.Pawn)) {
+		if (pickedPiece) pieceToMove = pickedPiece;
 
-			/* -------------------------------------------------------------------------- */
-			/*                                 En Passant                                 */
-			/* -------------------------------------------------------------------------- */
-			// Set potential en passant target
-			if (Math.abs(targetTile - startTile) === 16)
-				enPassantPotential = targetTile - (targetTile - startTile) / 2;
-			// Google en passant
-			else if (targetTile === currentEnPassantTarget) {
-				let holyHell = Piece.sameColor(pieceToMove, 'White') ? 8 : -8;
-				currentBoardArray[targetTile + holyHell] = Piece.None;
-			}
-		} else if (Piece.isType(pieceToMove, Piece.King)) {
-			/* -------------------------------------------------------------------------- */
-			/*                                  Castling                                  */
-			/* -------------------------------------------------------------------------- */
-			// Check if move is kingside castling
-			if (note?.[friendlyColor] === 'kingSide') {
-				currentBoardArray[startTile + 1] = currentBoardArray[startTile + 3];
-				currentBoardArray[startTile + 3] = Piece.None;
+		/* -------------------------------------------------------------------------- */
+		/*                                 En Passant                                 */
+		/* -------------------------------------------------------------------------- */
+		// Set potential en passant target
+		if (Math.abs(targetTile - startTile) === 16)
+			enPassantPotential = targetTile - (targetTile - startTile) / 2;
+		// Google en passant
+		else if (targetTile === currentEnPassantTarget) {
+			let holyHell = Piece.sameColor(pieceToMove, 'White') ? 8 : -8;
+			currentBoardArray[targetTile + holyHell] = Piece.None;
+		}
+	} else if (Piece.isType(pieceToMove, Piece.King)) {
+		/* -------------------------------------------------------------------------- */
+		/*                                  Castling                                  */
+		/* -------------------------------------------------------------------------- */
+		// Check if move is kingside castling
+		if (note?.[friendlyColor] === 'kingSide') {
+			currentBoardArray[startTile + 1] = currentBoardArray[startTile + 3];
+			currentBoardArray[startTile + 3] = Piece.None;
 
-				currentCastlingRights[friendlyColor].kingSide = false;
-			}
-			// Check if move is queenside castling
-			else if (note?.[friendlyColor] === 'queenSide') {
-				currentBoardArray[startTile - 1] = currentBoardArray[startTile - 4];
-				currentBoardArray[startTile - 4] = Piece.None;
+			if (includeCastlingSideEffect) currentCastlingRights[friendlyColor].kingSide = false;
+		}
+		// Check if move is queenside castling
+		else if (note?.[friendlyColor] === 'queenSide') {
+			currentBoardArray[startTile - 1] = currentBoardArray[startTile - 4];
+			currentBoardArray[startTile - 4] = Piece.None;
 
-				currentCastlingRights[friendlyColor].queenSide = false;
-			}
-			// Neither? then provoke all castling side
-			else {
+			if (includeCastlingSideEffect) currentCastlingRights[friendlyColor].queenSide = false;
+		}
+		// Neither? then provoke all castling side
+		else {
+			if (includeCastlingSideEffect)
 				currentCastlingRights[friendlyColor] = {
 					queenSide: false,
 					kingSide: false
 				};
-			}
-		} else if (Piece.isType(pieceToMove, Piece.Rook)) {
-			/* -------------------------------------------------------------------------- */
-			/*                             Castling Invalidate                            */
-			/* -------------------------------------------------------------------------- */
-			if (Piece.getRank(startTile) === 7) currentCastlingRights[friendlyColor].kingSide = false;
-			else if (Piece.getRank(startTile) === 0)
-				currentCastlingRights[friendlyColor].queenSide = false;
 		}
+	} else if (Piece.isType(pieceToMove, Piece.Rook) && includeCastlingSideEffect) {
+		/* -------------------------------------------------------------------------- */
+		/*                             Castling Invalidate                            */
+		/* -------------------------------------------------------------------------- */
+		if (Piece.getRank(startTile) === 7) currentCastlingRights[friendlyColor].kingSide = false;
+		else if (Piece.getRank(startTile) === 0) currentCastlingRights[friendlyColor].queenSide = false;
+	}
 
-		// Taking rook castle so revoke the rights
-		if (Piece.isType(targetPiece, Piece.Rook)) {
-			if (Piece.getRank(targetTile) === 7) currentCastlingRights[opponentColor].kingSide = false;
-			else if (Piece.getRank(targetTile) === 0)
-				currentCastlingRights[opponentColor].queenSide = false;
-		}
+	// Taking rook castle so revoke the rights
+	if (Piece.isType(targetPiece, Piece.Rook) && includeCastlingSideEffect) {
+		if (Piece.getRank(targetTile) === 7) currentCastlingRights[opponentColor].kingSide = false;
+		else if (Piece.getRank(targetTile) === 0)
+			currentCastlingRights[opponentColor].queenSide = false;
 	}
 
 	// Execute actual Moves
