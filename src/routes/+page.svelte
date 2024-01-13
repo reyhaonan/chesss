@@ -59,7 +59,7 @@
 </Board>
 
 
-<!-- TODO: 50 move rule, draw -->
+<!-- TODO: 50 move rule, draw, that wicked executeMove recursive weirdly altering local state -->
 
 <svelte:window on:beforeunload={() => reject()}/>
 
