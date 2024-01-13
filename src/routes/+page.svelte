@@ -50,7 +50,9 @@
 		</div>
 	</div>
 
-	<div class="absolute top-full"><button on:click={moveRandomly}>MOVE {turn}</button></div>
+	<div class="absolute top-full">
+		{JSON.stringify(castlingRights)}
+		<button on:click={moveRandomly}>MOVE {turn}</button></div>
 	<!-- {/if} -->
 </Board>
 
@@ -230,6 +232,9 @@
 		let pieceToMove = currentBoardArray[startTile]
 
 		let friendlyColor: Color = pieceToMove < 16? "White":"Black"
+		let opponentColor: Color = pieceToMove < 16? "Black":"White"
+
+		let targetPiece = currentBoardArray[targetTile]
 
 		let enPassantPotential = null
 
@@ -285,6 +290,14 @@
 			else if(Piece.isType(pieceToMove, Piece.Rook)){
 				if(Piece.getRank(startTile) === 7)currentCastlingRights[friendlyColor].kingSide = false
 				else if(Piece.getRank(startTile) === 0)currentCastlingRights[friendlyColor].queenSide = false
+			}
+			
+			
+
+			// Taking rook castle so revoke the rights
+			if(Piece.isType(targetPiece, Piece.Rook)){
+				if(Piece.getRank(targetTile) === 7)currentCastlingRights[opponentColor].kingSide = false
+				else if(Piece.getRank(targetTile) === 0)currentCastlingRights[opponentColor].queenSide = false
 			}
 		}
 
