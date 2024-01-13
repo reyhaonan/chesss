@@ -15,7 +15,7 @@
   </div>
   {#each board as file, i}
     {#each file as tile, j}
-      <div class={`w-20 aspect-square ${(i + j) % 2 == 0?"bg-stone-300":"bg-stone-500"}`}></div> 
+      <div class={`w-20 aspect-square ${(i + j) % 2 == 0?"bg-[#f2e1c3]":"bg-[#c3a082]"}`}></div> 
     {/each}
   {/each}
 
