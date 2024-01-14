@@ -52,14 +52,23 @@
 		</div>
 	</div>
 
-	<div class="absolute top-full">
-		{JSON.stringify(castlingRights)}
+	<div class="absolute top-full text-neutral-50">
+		<div class="font-bold text-2xl">Game param</div>
+		<li>
+			Castling rights(KQkq): {JSON.stringify(castlingRights)}
+		</li>
+		<li>
+			En Passant Target: {enPassantTarget}
+		</li>
+		<li>
+			lastMove: {JSON.stringify(lastMove)}
+		</li>
 		<button on:click={moveRandomly}>MOVE {turn}</button></div>
 	<!-- {/if} -->
 </Board>
 
 
-<!-- TODO: 50 move rule, draw, that wicked executeMove recursive weirdly altering local state -->
+<!-- TODO: 50 move rule -->
 
 <svelte:window on:beforeunload={() => reject()}/>
 
