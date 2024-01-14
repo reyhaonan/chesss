@@ -319,8 +319,9 @@ export const generateSlidingMove = (
 
 type BoardInfo = {
 	newBoardArray: number[];
-	enPassantPotential: number | null;
 	newCastlingRights: CastlingRightsType;
+	newEnPassantTarget: number | null;
+	newHalfMoveClock: number;
 };
 
 export const executeMove = (
@@ -328,6 +329,7 @@ export const executeMove = (
 	move: Move,
 	currentCastlingRights: CastlingRightsType,
 	currentEnPassantTarget: number | null,
+	currentHalfMoveClock: number,
 	pickedPiece?: number
 ): BoardInfo => {
 	let { start: startTile, target: targetTile, note } = move;
@@ -344,8 +346,13 @@ export const executeMove = (
 	let castlingRightsAddress = friendlyColor === 'White' ? [0, 1] : [2, 3];
 	let opponentCastlingRightsAddress = friendlyColor === 'White' ? [2, 3] : [0, 1];
 
+	// Add halfMove by one if it isnt a capture, reset to zero if it is a capture
+	currentHalfMoveClock = targetPiece === Piece.None ? ++currentHalfMoveClock : 0;
+
 	// Specialized move check
 	if (Piece.isType(pieceToMove, Piece.Pawn)) {
+		// Pawn capture reset half move clock
+		currentHalfMoveClock = 0;
 		if (pickedPiece) pieceToMove = pickedPiece;
 
 		/* -------------------------------------------------------------------------- */
@@ -405,7 +412,8 @@ export const executeMove = (
 
 	return {
 		newBoardArray: currentBoardArray,
-		enPassantPotential,
-		newCastlingRights: currentCastlingRights
+		newEnPassantTarget: enPassantPotential,
+		newCastlingRights: currentCastlingRights,
+		newHalfMoveClock: currentHalfMoveClock
 	};
 };

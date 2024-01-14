@@ -61,14 +61,17 @@
 			En Passant Target: {enPassantTarget}
 		</li>
 		<li>
-			lastMove: {JSON.stringify(lastMove)}
+			Half Move: {halfMoveClock}
+		</li>
+		<li>
+			Last Move: {JSON.stringify(lastMove)}
 		</li>
 		<button on:click={moveRandomly}>MOVE {turn}</button></div>
 	<!-- {/if} -->
 </Board>
 
 
-<!-- TODO: 50 move rule -->
+<!-- TODO: 50 move rule, 3 fold repetition -->
 
 <svelte:window on:beforeunload={() => reject()}/>
 
@@ -78,8 +81,8 @@
 	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
-	let boardArray = convertFENToBoardArray("2k5/7Q/8/8/8/8/1Q2Q3/5K2 w - - 0 1")
-	// let boardArray = convertFENToBoardArray(startingFEN)
+	// let boardArray = convertFENToBoardArray("2k5/7Q/8/8/8/8/1Q2Q3/5K2 w - - 0 1")
+	let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
 
@@ -100,13 +103,18 @@
 	let leftOffset = 0;
 
 	let lastMove:number[] = []
+
+	let halfMoveClock = 0;
 	
 
 	
-	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [...castlingRights], [], enPassantTarget, 1)
-	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, [...castlingRights], threatMoveList, enPassantTarget, 1)
+	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [],  [...castlingRights], enPassantTarget, halfMoveClock, 1)
+	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, threatMoveList, [...castlingRights], enPassantTarget, halfMoveClock, 1)
 
 	$: moveList, console.log("moveList", moveList)
+	
+	
+	$: if(halfMoveClock >= 100)alert("draw")
 	$: if(moveList.length === 0){
 		if(threatMoveList.some(move => Piece.isType(boardArray[move.target], Piece.King))){
 			alert(turn + " is lost")
@@ -130,9 +138,10 @@
 	const generateMoves = (
 			currentBoardArray: number[], 
 			currentTurn: Color, 
-			currentCastlingRights: CastlingRightsType, 
 			currentFutureMoveList: Move[], 
+			currentCastlingRights: CastlingRightsType, 
 			currentEnPassantTarget:number|null, 
+			currentHalfMoveClock:number,
 			futureCheck:number
 		) : Move[] => {
 
@@ -164,10 +173,10 @@
 
 		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 			
-			let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget)
+			let {newBoardArray, newEnPassantTarget, newCastlingRights, newHalfMoveClock} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock)
 			
 			// Filter out movement that would result in king getting targetted
-			return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], nextTurn, {...newCastlingRights}, currentFutureMoveList, enPassantPotential, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
+			return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], nextTurn, currentFutureMoveList, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
 		})
 
 		
@@ -225,15 +234,17 @@
 			}
 		}
 
-		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...boardArray], move, [...castlingRights], enPassantTarget, pickedPiece )
+		let {newBoardArray, newCastlingRights, newEnPassantTarget, newHalfMoveClock} = executeMove([...boardArray], move, [...castlingRights], enPassantTarget, halfMoveClock, pickedPiece  )
 
 		console.log("surprise ", newCastlingRights)
 
 		lastMove = [startTile, targetTile]
 
-		enPassantTarget = enPassantPotential;
+		enPassantTarget = newEnPassantTarget;
 
 		selectedTile = -1;
+
+		halfMoveClock = newHalfMoveClock
 
 		turn = turn == "Black" ? "White" : "Black"
 
