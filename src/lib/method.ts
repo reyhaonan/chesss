@@ -417,3 +417,20 @@ export const executeMove = (
 		newHalfMoveClock: currentHalfMoveClock
 	};
 };
+
+export const isThreefoldRepetition = (array: number[][]): boolean => {
+	const seenArrays = new Map<string, number>();
+
+	for (const innerArray of array) {
+		const arrayString = JSON.stringify(innerArray);
+
+		const count = seenArrays.get(arrayString) || 0;
+		seenArrays.set(arrayString, count + 1);
+
+		if (count + 1 === 3) {
+			return true;
+		}
+	}
+
+	return false;
+};

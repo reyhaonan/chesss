@@ -82,7 +82,7 @@
 <script lang="ts">
 	import Board from "$components/Board.svelte";
 	import Tile from "$components/Tile.svelte";
-	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
+	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, isThreefoldRepetition, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 	
 	// https://lichess.org/eptElcpI
@@ -147,7 +147,9 @@
 
 	// i store only 6 of these for threefold checks
 	let boardArrayHistory: number[][] = [boardArray]
-	
+
+	$: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
+
 
 	
 	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [],  [...castlingRights], enPassantTarget, halfMoveClock, 1)
