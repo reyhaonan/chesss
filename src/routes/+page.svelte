@@ -66,6 +66,9 @@
 		<li>
 			Last Move: {JSON.stringify(lastMove)}
 		</li>
+		<li>
+			Board History: {JSON.stringify(boardArrayHistory)}
+		</li>
 		<button on:click={moveRandomly}>MOVE {turn}</button></div>
 	<!-- {/if} -->
 </Board>
@@ -105,6 +108,9 @@
 	let lastMove:number[] = []
 
 	let halfMoveClock = 0;
+
+	// i store only 6 of these for threefold checks
+	let boardArrayHistory: number[][] = []
 	
 
 	
@@ -249,6 +255,11 @@
 		turn = turn == "Black" ? "White" : "Black"
 
 		castlingRights = newCastlingRights;
+
+		if(boardArrayHistory.length >= 6)boardArrayHistory.shift()
+		boardArrayHistory.push([...boardArray])
+
+		boardArrayHistory = boardArrayHistory
 
 		boardArray = newBoardArray;
 	}
