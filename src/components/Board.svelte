@@ -1,7 +1,9 @@
 
 <!-- Graphical only -->
 
-<div class="grid grid-cols-8 aspect-square rounded-md border-neutral-800 relative">
+<!-- thank you chess.com -->
+<div class="w-[640px] aspect-square rounded-md relative bg-cover bg-center" 
+style="background-image: url('https://images.chesscomfiles.com/chess-themes/boards/green/200.png');">
   <!-- Indication row -->
   <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-semibold">
     {#each Array(8) as num, i}
@@ -13,11 +15,11 @@
       <div class="pb-1 text-right pr-2">{alp}</div>
     {/each}
   </div>
-  {#each board as file, i}
+  <!-- {#each board as file, i}
     {#each file as tile, j}
-      <div class={`w-20 aspect-square ${(i + j) % 2 == 0?"bg-[#f2e1c3]":"bg-[#c3a082]"}`}></div> 
+      <div class={`aspect-square ${(i + j) % 2 == 0?"bg-[#e9edcc]":"bg-[#789954]"}`}></div> 
     {/each}
-  {/each}
+  {/each} -->
 
   <slot/>
 
