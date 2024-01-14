@@ -69,15 +69,15 @@
 	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
-	// let boardArray = convertFENToBoardArray("8/8/8/2k5/2pP4/8/B7/4K3 b - d3 0 3")
-	let boardArray = convertFENToBoardArray(startingFEN)
+	let boardArray = convertFENToBoardArray("2k5/7Q/8/8/8/8/1Q2Q3/5K2 w - - 0 1")
+	// let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
 
 	let moveList:Move[] = []
 
 	
-	let futureMoveList: Move[] = []
+	let threatMoveList: Move[] = []
 
 
 	let selectedTile:number = -1;
@@ -94,11 +94,17 @@
 	
 
 	
-	$: boardArray, futureMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [...castlingRights], [], enPassantTarget, 1)
-	$: futureMoveList, moveList =  generateMoves([...boardArray], turn, [...castlingRights], futureMoveList, enPassantTarget, 1)
+	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [...castlingRights], [], enPassantTarget, 1)
+	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, [...castlingRights], threatMoveList, enPassantTarget, 1)
 
 	$: moveList, console.log("moveList", moveList)
-	$: if(moveList.length === 0)alert(turn + " is lost");
+	$: if(moveList.length === 0){
+		if(threatMoveList.some(move => Piece.isType(boardArray[move.target], Piece.King))){
+			alert(turn + " is lost")
+		}else{
+			alert("draw")
+		}
+	}
 
 	// $: turn, boardArray, moveList, moveRandomly()
 
@@ -147,31 +153,17 @@
 			}
 		}
 
-		let legalMove: Move[] = []
-		
-		// Filter out movement that would result in king getting targetted
-		if(futureCheck > 0){
-			// "Execute" this move to show what the board looks like after this move
+		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 			
-			for(let i = 0; i < tempMoveList.length;i++){
-				let move = tempMoveList[i]
-
-				let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move, [...currentCastlingRights], currentEnPassantTarget, true);
-				
-				let hasAPieceThatWillAttackKing = generateMoves([...newBoardArray], nextTurn, [...newCastlingRights], [...currentFutureMoveList], enPassantPotential, --futureCheck)
-					.some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
-
-				if(!hasAPieceThatWillAttackKing && move.target >= 0 && move.target < 64)legalMove.push(move)
-			}
+			let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget)
 			
-		}
-		
-		// executeMove([...currentBoardArray], tempMoveList.find(e => e.target === 7)?? tempMoveList[0], {...currentCastlingRights}, currentEnPassantTarget, true)
-		
+			// Filter out movement that would result in king getting targetted
+			return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], nextTurn, {...newCastlingRights}, currentFutureMoveList, enPassantPotential, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
+		})
 
 		
 
-		return legalMove
+		return tempMoveList
 	}
 
 
@@ -224,7 +216,7 @@
 			}
 		}
 
-		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...boardArray], move, [...castlingRights], enPassantTarget, true, pickedPiece )
+		let {newBoardArray, enPassantPotential, newCastlingRights} = executeMove([...boardArray], move, [...castlingRights], enPassantTarget, pickedPiece )
 
 		console.log("surprise ", newCastlingRights)
 
@@ -243,7 +235,7 @@
 
 
 
-	$: futureMoveList, console.log("futureMovelist", futureMoveList)
+	$: threatMoveList, console.log("threatMoveList", threatMoveList)
 
 
 </script>

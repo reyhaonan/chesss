@@ -122,7 +122,7 @@ export const generateCastlingMove = (
 	tileIndex: number,
 	piece: number,
 	currentBoardArray: number[],
-	currentFutureMoveList: Move[],
+	currentThreatMoveList: Move[],
 	currentCastlingRights: CastlingRightsType
 ): Move[] => {
 	const friendlyColor = piece < 16 ? 'White' : 'Black';
@@ -146,7 +146,7 @@ export const generateCastlingMove = (
 
 				// Check for targeted squares
 				if (i < rookOffset) {
-					isValid = isValid && !currentFutureMoveList.some((e) => e.target === tileIndex + offset);
+					isValid = isValid && !currentThreatMoveList.some((e) => e.target === tileIndex + offset);
 				}
 
 				// Check for empty squares and correct rook
@@ -328,7 +328,6 @@ export const executeMove = (
 	move: Move,
 	currentCastlingRights: CastlingRightsType,
 	currentEnPassantTarget: number | null,
-	includeCastlingSideEffect: boolean,
 	pickedPiece?: number
 ): BoardInfo => {
 	let { start: startTile, target: targetTile, note } = move;
@@ -369,21 +368,21 @@ export const executeMove = (
 			currentBoardArray[startTile + 1] = currentBoardArray[startTile + 3];
 			currentBoardArray[startTile + 3] = Piece.None;
 
-			if (includeCastlingSideEffect) currentCastlingRights[castlingRightsAddress[0]] = false;
+			currentCastlingRights[castlingRightsAddress[0]] = false;
 		}
 		// Check if move is queenside castling
 		else if (note?.[friendlyColor] === 'queenSide') {
 			currentBoardArray[startTile - 1] = currentBoardArray[startTile - 4];
 			currentBoardArray[startTile - 4] = Piece.None;
 
-			if (includeCastlingSideEffect) currentCastlingRights[castlingRightsAddress[1]] = false;
+			currentCastlingRights[castlingRightsAddress[1]] = false;
 		}
 		// Neither? then provoke all castling side
 		else {
-			if (includeCastlingSideEffect) currentCastlingRights[castlingRightsAddress[0]] = false;
+			currentCastlingRights[castlingRightsAddress[0]] = false;
 			currentCastlingRights[castlingRightsAddress[1]] = false;
 		}
-	} else if (Piece.isType(pieceToMove, Piece.Rook) && includeCastlingSideEffect) {
+	} else if (Piece.isType(pieceToMove, Piece.Rook)) {
 		/* -------------------------------------------------------------------------- */
 		/*                             Castling Invalidate                            */
 		/* -------------------------------------------------------------------------- */
@@ -393,7 +392,7 @@ export const executeMove = (
 	}
 
 	// Taking rook castle so revoke the rights
-	if (Piece.isType(targetPiece, Piece.Rook) && includeCastlingSideEffect) {
+	if (Piece.isType(targetPiece, Piece.Rook)) {
 		if (Piece.getRank(targetTile) === 7)
 			currentCastlingRights[opponentCastlingRightsAddress[0]] = false;
 		else if (Piece.getRank(targetTile) === 0)
