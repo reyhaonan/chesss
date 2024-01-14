@@ -78,13 +78,32 @@
 
 <svelte:window on:beforeunload={() => reject()}/>
 
+
 <script lang="ts">
 	import Board from "$components/Board.svelte";
 	import Tile from "$components/Tile.svelte";
 	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
+	
+	const analyzeThis = [
+		[0,0,17,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,0,9,0,0],
 
-	let boardArray = convertFENToBoardArray("2k5/1r6/8/8/8/8/4B1N1/5K2 w - - 0 1")
+		[0,0,17,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,9,0,0,0],
+		
+		[0,17,0,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,9,0,0,0],
+		
+		[0,17,0,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,0,9,0,0],
+		
+		[0,0,17,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,0,9,0,0],
+		
+		[0,0,17,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,0,0,9,0],
+		
+		[0,17,0,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,0,0,9,0],
+		
+		[0,17,0,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,11,0,0,0,0,0,0,9,0,0]
+	]
+
+	let boardArray = convertFENToBoardArray("2k5/1r6/8/8/8/8/4B1N1/5K2 w - - 1 1")
 	// let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
@@ -118,7 +137,8 @@
 	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, threatMoveList, [...castlingRights], enPassantTarget, halfMoveClock, 1)
 
 	$: moveList, console.log("moveList", moveList)
-	
+	// $: if()alert("draw")
+
 	
 	$: if(halfMoveClock >= 100)alert("draw")
 	$: if(moveList.length === 0){
