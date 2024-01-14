@@ -84,8 +84,8 @@
 	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, numberOfTilesToEdge, Piece } from "$lib/method";
 	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
 
-	// let boardArray = convertFENToBoardArray("2k5/7Q/8/8/8/8/1Q2Q3/5K2 w - - 0 1")
-	let boardArray = convertFENToBoardArray(startingFEN)
+	let boardArray = convertFENToBoardArray("2k5/1r6/8/8/8/8/4B1N1/5K2 w - - 0 1")
+	// let boardArray = convertFENToBoardArray(startingFEN)
 
 	let turn:Color = "White";
 
@@ -256,7 +256,7 @@
 
 		castlingRights = newCastlingRights;
 
-		if(boardArrayHistory.length >= 6)boardArrayHistory.shift()
+		if(boardArrayHistory.length >= 8)boardArrayHistory.shift()
 		boardArrayHistory.push([...boardArray])
 
 		boardArrayHistory = boardArrayHistory
