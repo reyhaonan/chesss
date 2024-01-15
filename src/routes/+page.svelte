@@ -52,7 +52,7 @@
 		</div>
 	</div>
 
-	<div class="absolute top-full text-neutral-50">
+	<!-- <div class="absolute top-full text-neutral-50">
 		<div class="font-bold text-2xl">Game param</div>
 		<li>
 			Castling rights(KQkq): {JSON.stringify(castlingRights)}
@@ -69,7 +69,7 @@
 		<li>
 			Board History: {JSON.stringify(boardArrayHistory)}
 		</li>
-		<button on:click={moveRandomly}>MOVE {turn}</button></div>
+		<button on:click={moveRandomly}>MOVE {turn}</button></div> -->
 	<!-- {/if} -->
 </Board>
 
