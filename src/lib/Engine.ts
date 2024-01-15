@@ -1,4 +1,4 @@
-import { direction, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move } from './misc';
+import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, } from './misc';
 
 // export const generateMoves = (piece: ) => {}
 
@@ -85,6 +85,30 @@ export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRi
 
 	return [boardArray, newTurn, newCastlingRights, newEnPassantTarget, newHalfMoveClock, newFullMoveClock];
 };
+
+export const convertNumberToAlgebraicNotation = (coord: number): string => {
+	const rank = Piece.getRank(coord);
+  const file = Piece.getFile(coord);
+
+	if (rank < 0 || rank > 7 || file < 0 || file > 7) {
+    throw new Error("Invalid board coordinate: " + coord);
+  }
+
+	return `${alphabet[rank]}${(file + 1)}`
+}
+
+export const convertAlgebraicNotationToNumber = (coord: string):number => {
+	const [rankChar, fileStr] = coord;
+
+  const rank = rankLookup[rankChar.toLowerCase()];
+  const file = Number(fileStr) - 1;
+
+  if (rank === undefined || isNaN(file)) {
+    throw new Error("Invalid algebraic notation: " + coord);
+  }
+
+  return rank + file * 8;
+}
 
 const generateNumberOfTilesToEdge = (): number[][] => {
 	const temp: number[][] = [];

@@ -29,7 +29,8 @@ style="background-image: url('https://images.chesscomfiles.com/chess-themes/boar
 
 
 <script lang="typescript">
-  let alphabet = ["a","b","c","d","e","f","g", "h"]
+	import { alphabet } from "$lib/misc";
+
   // 8x8 2d array
   var board = [...Array(8)].map(e => Array(8));
 </script>

@@ -48,3 +48,14 @@ export type BoardInfo = {
 	newHalfMoveClock: number;
 	newFullMoveClock: number;
 };
+
+export type Alphabet = "a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"
+
+export const alphabet: string[] = ["a","b","c","d","e","f","g","h"]
+
+export const rankLookup:{[key:string]:number} = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
+
+
+export type Num = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+
+export type AlgebraicNotation = `${Alphabet}${Num}`
