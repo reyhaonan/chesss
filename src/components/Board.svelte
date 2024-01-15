@@ -5,14 +5,14 @@
 <div class="w-[640px] aspect-square rounded-md relative bg-cover bg-center" 
 style="background-image: url('https://images.chesscomfiles.com/chess-themes/boards/green/200.png');">
   <!-- Indication row -->
-  <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-semibold">
-    {#each fileArray as num}
-      <div class="pl-1">{num}</div>
+  <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-bold">
+    {#each fileArray as num, i}
+      <div class={`pl-1 ${i % 2 !== 0? "text-[#e9edcc]":"text-[#789954]"}`}>{num}</div>
     {/each}
   </div>
-  <div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 text-slate-900 font-semibold">
+  <div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 text-slate-900 font-bold">
     {#each alphabet as alp, i}
-      <div class="pb-1 text-right pr-2">{alp}</div>
+      <div class={`pb-1 text-right pr-2 ${i % 2 === 0? "text-[#e9edcc]":"text-[#789954]"}`}>{alp}</div>
     {/each}
   </div>
   <!-- {#each board as file, i}

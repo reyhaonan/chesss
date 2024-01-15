@@ -52,7 +52,7 @@
 		</div>
 	</div>
 
-	<!-- <div class="absolute top-full text-neutral-50">
+	<div class="absolute top-full text-neutral-50">
 		<div class="font-bold text-2xl">Game param</div>
 		<li>
 			Castling rights(KQkq): {JSON.stringify(castlingRights)}
@@ -64,17 +64,11 @@
 			Half Move: {halfMoveClock}
 		</li>
 		<li>
-			Last Move: {JSON.stringify(lastMove)}
+			Full Move: {fullMoveClock}
 		</li>
-		<li>
-			Board History: {JSON.stringify(boardArrayHistory)}
-		</li>
-		<button on:click={moveRandomly}>MOVE {turn}</button></div> -->
+		<button on:click={moveRandomly}>MOVE {turn}</button></div>
 	<!-- {/if} -->
 </Board>
-
-
-<!-- TODO: 50 move rule, 3 fold repetition -->
 
 <svelte:window on:beforeunload={() => reject()}/>
 
@@ -195,7 +189,7 @@
 			}
 		}
 
-		let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock} = executeMove([...boardArray], move, turn,[...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, pickedPiece  )
+		let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock, newFullMoveClock} = executeMove([...boardArray], move, turn,[...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, pickedPiece  )
 
 		console.log("surprise ", newCastlingRights)
 
@@ -207,6 +201,7 @@
 
 		halfMoveClock = newHalfMoveClock
 
+		fullMoveClock = newFullMoveClock
 
 		turn = newTurn
 
