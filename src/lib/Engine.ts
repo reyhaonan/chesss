@@ -1,11 +1,30 @@
-import { direction, type BoardHistory, type CastlingRightsType, type Color, type Move } from './misc';
+import { direction, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move } from './misc';
 
 // export const generateMoves = (piece: ) => {}
 
-export const convertFENToBoardArray = (FEN: string) => {
+export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRightsType, number | null, number, number] => {
 	const boardArray: number[] = [];
 
-	FEN.split(' ')[0]
+	let newTurn: Color,
+		newCastlingRights: CastlingRightsType = [false, false, false, false], 
+		newEnPassantTarget: number | null,
+		newHalfMoveClock: number,
+		newFullMoveClock: number
+
+	let boardInfo = FEN.split(" ")
+
+	// 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+	/**
+	 * 0: Board Array
+	 * 1: Turn
+	 * 2: Castling Rights
+	 * 3: En Passant Target
+	 * 4: Half Move Clock
+	 * 5: Full Move Clock
+	 */
+
+	// Board Array
+	boardInfo[0]
 		.split('/')
 		.forEach((rank) => {
 			rank.split('').forEach((piece) => {
@@ -37,7 +56,34 @@ export const convertFENToBoardArray = (FEN: string) => {
 			});
 		});
 
-	return boardArray;
+	// Turn
+	newTurn = boardInfo[1] === "w" ? "White":"Black"
+
+	// Castling Rights
+	for(const char of boardInfo[2]){
+		switch(char){
+			case 'K':
+					newCastlingRights[0] = true
+			case 'Q':
+					newCastlingRights[1] = true
+			case 'k':
+					newCastlingRights[2] = true
+			case 'q':
+					newCastlingRights[3] = true
+		}
+	}
+
+	// TODO: Convert position to number
+	// En Passant
+	newEnPassantTarget = boardInfo[3] === "-"? null: 0
+
+	// Half Move Clock
+	newHalfMoveClock = Number(boardInfo[4])
+	
+	// Full Move Clock
+	newFullMoveClock = Number(boardInfo[5])
+
+	return [boardArray, newTurn, newCastlingRights, newEnPassantTarget, newHalfMoveClock, newFullMoveClock];
 };
 
 const generateNumberOfTilesToEdge = (): number[][] => {
@@ -126,12 +172,11 @@ export const generateMoves = (
 	currentCastlingRights: CastlingRightsType, 
 	currentEnPassantTarget:number|null, 
 	currentHalfMoveClock:number,
+	currentFullMoveList:number,
 	futureCheck:number
 ) : Move[] => {
 
 	let tempMoveList:Move[] = []
-
-	let nextTurn:Color = currentTurn === "White" ? "Black" : "White"
 
 	for(let i = 0;i < 64;i++){
 		let piece = currentBoardArray[i];
@@ -157,10 +202,10 @@ export const generateMoves = (
 
 	if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 		
-		let {newBoardArray, newEnPassantTarget, newCastlingRights, newHalfMoveClock} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock)
+		let {newBoardArray, newEnPassantTarget, newTurn, newCastlingRights, newHalfMoveClock, newFullMoveClock} = executeMove([...currentBoardArray], move, currentTurn,{...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock, currentFullMoveList)
 		
 		// Filter out movement that would result in king getting targetted
-		return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], nextTurn, currentFutureMoveList, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
+		return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], newTurn, currentFutureMoveList, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
 	})
 
 
@@ -369,19 +414,15 @@ export const generateSlidingMove = (
 	return tempMoveList;
 };
 
-type BoardInfo = {
-	newBoardArray: number[];
-	newCastlingRights: CastlingRightsType;
-	newEnPassantTarget: number | null;
-	newHalfMoveClock: number;
-};
 
 export const executeMove = (
 	currentBoardArray: number[],
 	move: Move,
+	currentTurn: Color,
 	currentCastlingRights: CastlingRightsType,
 	currentEnPassantTarget: number | null,
 	currentHalfMoveClock: number,
+	currentFullMoveClock: number,
 	pickedPiece?: number
 ): BoardInfo => {
 	let { start: startTile, target: targetTile, note } = move;
@@ -462,11 +503,16 @@ export const executeMove = (
 	currentBoardArray[targetTile] = pieceToMove;
 	currentBoardArray[startTile] = Piece.None;
 
+	
+	if(currentTurn === "Black")currentFullMoveClock
+
 	return {
 		newBoardArray: currentBoardArray,
+		newTurn: currentTurn === "White"?"Black":"White",
 		newEnPassantTarget: enPassantPotential,
 		newCastlingRights: currentCastlingRights,
-		newHalfMoveClock: currentHalfMoveClock
+		newHalfMoveClock: currentHalfMoveClock,
+		newFullMoveClock: currentFullMoveClock
 	};
 };
 

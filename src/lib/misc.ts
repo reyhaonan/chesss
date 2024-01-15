@@ -38,3 +38,13 @@ export type CastlingRightsType = [boolean, boolean, boolean, boolean];
 
 
 export type BoardHistory = [number[], CastlingRightsType, number | null]
+
+
+export type BoardInfo = {
+	newBoardArray: number[];
+	newTurn: Color;
+	newCastlingRights: CastlingRightsType;
+	newEnPassantTarget: number | null;
+	newHalfMoveClock: number;
+	newFullMoveClock: number;
+};

@@ -87,29 +87,20 @@
 
 
 	// let boardArray = convertFENToBoardArray("3k4/7p/8/8/8/8/P7/3K4 w - - 0 1")
-	let boardArray = convertFENToBoardArray(startingFEN)
-
-	let turn:Color = "White";
+	let [boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock ] = convertFENToBoardArray(startingFEN)
 
 	let moveList:Move[] = []
-
 	
 	let threatMoveList: Move[] = []
 
 
 	let selectedTile:number = -1;
 
-	let castlingRights: CastlingRightsType = [true, true, true, true]
-
-	let enPassantTarget:number|null = null
-
 	let piecePickerIsOpen = false;
 	let topOffset = 0;
 	let leftOffset = 0;
 
 	let lastMove:number[] = []
-
-	let halfMoveClock = 0;
 
 	// i store only 6 of these for threefold checks
 	let boardArrayHistory: BoardHistory[] = [[boardArray, castlingRights, enPassantTarget]]
@@ -118,8 +109,8 @@
 
 
 	
-	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [],  [...castlingRights], enPassantTarget, halfMoveClock, 1)
-	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, threatMoveList, [...castlingRights], enPassantTarget, halfMoveClock, 1)
+	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [],  [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, 1)
+	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, threatMoveList, [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, 1)
 
 	$: moveList, console.log("moveList", moveList)
 	// $: if()alert("draw")
@@ -197,7 +188,7 @@
 			}
 		}
 
-		let {newBoardArray, newCastlingRights, newEnPassantTarget, newHalfMoveClock} = executeMove([...boardArray], move, [...castlingRights], enPassantTarget, halfMoveClock, pickedPiece  )
+		let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock} = executeMove([...boardArray], move, turn,[...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, pickedPiece  )
 
 		console.log("surprise ", newCastlingRights)
 
@@ -209,7 +200,8 @@
 
 		halfMoveClock = newHalfMoveClock
 
-		turn = turn == "Black" ? "White" : "Black"
+
+		turn = newTurn
 
 		castlingRights = newCastlingRights;
 
