@@ -59,3 +59,5 @@ export const rankLookup:{[key:string]:number} = { a: 0, b: 1, c: 2, d: 3, e: 4, 
 export type Num = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 
 export type AlgebraicNotation = `${Alphabet}${Num}`
+
+export const FENRegex = /^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([bw])\s([KQkq]{1,4})\s(-|[a-h][1-8])\s(\d+\s\d+)$/

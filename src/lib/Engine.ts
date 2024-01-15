@@ -1,8 +1,13 @@
-import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, } from './misc';
+import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, } from './misc';
 
 // export const generateMoves = (piece: ) => {}
 
 export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRightsType, number | null, number, number] => {
+
+	if(!FENRegex.test(FEN)){
+		throw new Error("Invalid FEN String: " + FEN)
+	}
+
 	const boardArray: number[] = [];
 
 	let newTurn: Color,
@@ -11,20 +16,12 @@ export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRi
 		newHalfMoveClock: number,
 		newFullMoveClock: number
 
-	let boardInfo = FEN.split(" ")
+	let [boardInfo, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock] = FEN.split(" ")
 
 	// 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-	/**
-	 * 0: Board Array
-	 * 1: Turn
-	 * 2: Castling Rights
-	 * 3: En Passant Target
-	 * 4: Half Move Clock
-	 * 5: Full Move Clock
-	 */
 
 	// Board Array
-	boardInfo[0]
+	boardInfo
 		.split('/')
 		.forEach((rank) => {
 			rank.split('').forEach((piece) => {
@@ -57,10 +54,10 @@ export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRi
 		});
 
 	// Turn
-	newTurn = boardInfo[1] === "w" ? "White":"Black"
+	newTurn = turn === "w" ? "White":"Black"
 
 	// Castling Rights
-	for(const char of boardInfo[2]){
+	for(const char of castlingRights){
 		switch(char){
 			case 'K':
 					newCastlingRights[0] = true
@@ -75,13 +72,13 @@ export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRi
 
 	// TODO: Convert position to number
 	// En Passant
-	newEnPassantTarget = boardInfo[3] === "-"? null: 0
+	newEnPassantTarget = enPassantTarget === "-"? null: 0
 
 	// Half Move Clock
-	newHalfMoveClock = Number(boardInfo[4])
+	newHalfMoveClock = Number(halfMoveClock)
 	
 	// Full Move Clock
-	newFullMoveClock = Number(boardInfo[5])
+	newFullMoveClock = Number(fullMoveClock)
 
 	return [boardArray, newTurn, newCastlingRights, newEnPassantTarget, newHalfMoveClock, newFullMoveClock];
 };
