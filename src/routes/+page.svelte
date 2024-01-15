@@ -82,8 +82,8 @@
 <script lang="ts">
 	import Board from "$components/Board.svelte";
 	import Tile from "$components/Tile.svelte";
-	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generatePawnMove, generateSlidingMove, isThreefoldRepetition, numberOfTilesToEdge, Piece } from "$lib/method";
-	import { direction, startingFEN, type Move, type Color, type CastlingRightsType } from "$lib/misc";
+	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generateMoves, generatePawnMove, generateSlidingMove, isThreefoldRepetition, numberOfTilesToEdge, Piece } from "$lib/Engine";
+	import { direction, startingFEN, type Move, type Color, type CastlingRightsType, type BoardHistory } from "$lib/misc";
 	
 	// https://lichess.org/eptElcpI
 	const analyzeThis = [
@@ -146,7 +146,7 @@
 	let halfMoveClock = 0;
 
 	// i store only 6 of these for threefold checks
-	let boardArrayHistory: number[][] = [boardArray]
+	let boardArrayHistory: BoardHistory[] = [[boardArray, castlingRights, enPassantTarget]]
 
 	$: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
 
@@ -180,54 +180,6 @@
 	}
 
 
-	const generateMoves = (
-			currentBoardArray: number[], 
-			currentTurn: Color, 
-			currentFutureMoveList: Move[], 
-			currentCastlingRights: CastlingRightsType, 
-			currentEnPassantTarget:number|null, 
-			currentHalfMoveClock:number,
-			futureCheck:number
-		) : Move[] => {
-
-		let tempMoveList:Move[] = []
-
-		let nextTurn:Color = currentTurn === "White" ? "Black" : "White"
-		
-		for(let i = 0;i < 64;i++){
-			let piece = currentBoardArray[i];
-			
-			// this piece turn
-			if(Piece.sameColor(piece, currentTurn)){
-				
-				if(Piece.isType(piece, Piece.Pawn)){
-					tempMoveList.push(...generatePawnMove(i, piece, currentBoardArray, currentEnPassantTarget))
-				}
-				else if(Piece.isType(piece, Piece.Knight)){
-					tempMoveList.push(...generateKnightMove(i, piece,  currentBoardArray))
-				}
-				else if(Piece.isType(piece, Piece.King)){
-					tempMoveList.push(...generateCastlingMove(i, piece, currentBoardArray, currentFutureMoveList ,currentCastlingRights))
-					tempMoveList.push(...generateSlidingMove(i, piece, currentBoardArray))
-				}
-				else {
-					tempMoveList.push(...generateSlidingMove(i, piece, currentBoardArray))
-				}
-			}
-		}
-
-		if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
-			
-			let {newBoardArray, newEnPassantTarget, newCastlingRights, newHalfMoveClock} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock)
-			
-			// Filter out movement that would result in king getting targetted
-			return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], nextTurn, currentFutureMoveList, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
-		})
-
-		
-
-		return tempMoveList
-	}
 
 
 	const pickPiece = (pieceNumber: number) => {
@@ -296,7 +248,7 @@
 		castlingRights = newCastlingRights;
 
 		if(boardArrayHistory.length >= 10)boardArrayHistory.shift()
-		boardArrayHistory.push([...newBoardArray])
+		boardArrayHistory.push([[...newBoardArray], [...newCastlingRights], newEnPassantTarget])
 
 		boardArrayHistory = boardArrayHistory
 

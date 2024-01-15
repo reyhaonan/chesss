@@ -46,7 +46,7 @@
 </div>
 
 <script lang="ts">
-	import { Piece, numberOfTilesToEdge } from "$lib/method";
+	import { Piece, numberOfTilesToEdge } from "$lib/Engine";
 	import type { Color } from "$lib/misc";
 
   export let pieceNumber:number = 0;

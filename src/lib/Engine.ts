@@ -1,4 +1,4 @@
-import { direction, type CastlingRightsType, type Color, type Move } from './misc';
+import { direction, type BoardHistory, type CastlingRightsType, type Color, type Move } from './misc';
 
 // export const generateMoves = (piece: ) => {}
 
@@ -117,6 +117,58 @@ export const Piece = {
 	 */
 	getRank: (tileNumber: number) => tileNumber % 8
 };
+
+
+export const generateMoves = (
+	currentBoardArray: number[], 
+	currentTurn: Color, 
+	currentFutureMoveList: Move[], 
+	currentCastlingRights: CastlingRightsType, 
+	currentEnPassantTarget:number|null, 
+	currentHalfMoveClock:number,
+	futureCheck:number
+) : Move[] => {
+
+	let tempMoveList:Move[] = []
+
+	let nextTurn:Color = currentTurn === "White" ? "Black" : "White"
+
+	for(let i = 0;i < 64;i++){
+		let piece = currentBoardArray[i];
+		
+		// this piece turn
+		if(Piece.sameColor(piece, currentTurn)){
+			
+			if(Piece.isType(piece, Piece.Pawn)){
+				tempMoveList.push(...generatePawnMove(i, piece, currentBoardArray, currentEnPassantTarget))
+			}
+			else if(Piece.isType(piece, Piece.Knight)){
+				tempMoveList.push(...generateKnightMove(i, piece,  currentBoardArray))
+			}
+			else if(Piece.isType(piece, Piece.King)){
+				tempMoveList.push(...generateCastlingMove(i, piece, currentBoardArray, currentFutureMoveList ,currentCastlingRights))
+				tempMoveList.push(...generateSlidingMove(i, piece, currentBoardArray))
+			}
+			else {
+				tempMoveList.push(...generateSlidingMove(i, piece, currentBoardArray))
+			}
+		}
+	}
+
+	if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
+		
+		let {newBoardArray, newEnPassantTarget, newCastlingRights, newHalfMoveClock} = executeMove([...currentBoardArray], move, {...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock)
+		
+		// Filter out movement that would result in king getting targetted
+		return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], nextTurn, currentFutureMoveList, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
+	})
+
+
+
+	return tempMoveList
+}
+
+
 
 export const generateCastlingMove = (
 	tileIndex: number,
@@ -418,7 +470,7 @@ export const executeMove = (
 	};
 };
 
-export const isThreefoldRepetition = (array: number[][]): boolean => {
+export const isThreefoldRepetition = (array: BoardHistory[]): boolean => {
 	const seenArrays = new Map<string, number>();
 
 	for (const innerArray of array) {

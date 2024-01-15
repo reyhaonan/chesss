@@ -35,3 +35,6 @@ export type Color = 'White' | 'Black';
 
 // white kingside, white queenside, black kingside, black queenside
 export type CastlingRightsType = [boolean, boolean, boolean, boolean];
+
+
+export type BoardHistory = [number[], CastlingRightsType, number | null]
