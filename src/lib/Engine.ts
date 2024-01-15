@@ -1,8 +1,8 @@
-import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, filesLookup, fileArray, } from './misc';
+import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, filesLookup, fileArray, type BoardInfoArray, PieceType, PieceColor, } from './misc';
 
 // export const generateMoves = (piece: ) => {}
 
-export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRightsType, number | null, number, number] => {
+export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 
 	if(!FENRegex.test(FEN)){
 		throw new Error("Invalid FEN String: " + FEN)
@@ -25,30 +25,30 @@ export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRi
 		.split('/')
 		.forEach((rank) => {
 			rank.split('').forEach((piece) => {
-				let color: number = piece == piece.toUpperCase() ? Piece.White : Piece.Black;
+				let color: number = piece == piece.toUpperCase() ? PieceColor.White : PieceColor.Black;
 
 				switch (piece.toLowerCase()) {
 					case 'k':
-						boardArray.push(Piece.King + color);
+						boardArray.push(PieceType.King + color);
 						break;
 					case 'p':
-						boardArray.push(Piece.Pawn + color);
+						boardArray.push(PieceType.Pawn + color);
 						break;
 					case 'n':
-						boardArray.push(Piece.Knight + color);
+						boardArray.push(PieceType.Knight + color);
 						break;
 					case 'b':
-						boardArray.push(Piece.Bishop + color);
+						boardArray.push(PieceType.Bishop + color);
 						break;
 					case 'r':
-						boardArray.push(Piece.Rook + color);
+						boardArray.push(PieceType.Rook + color);
 						break;
 					case 'q':
-						boardArray.push(Piece.Queen + color);
+						boardArray.push(PieceType.Queen + color);
 						break;
 
 					default:
-						boardArray.push(...Array(Number(piece)).fill(Piece.None));
+						boardArray.push(...Array(Number(piece)).fill(PieceType.None));
 				}
 			});
 		});
@@ -138,25 +138,16 @@ const generateNumberOfTilesToEdge = (): number[][] => {
 export const numberOfTilesToEdge = generateNumberOfTilesToEdge();
 
 export const Piece = {
-	None: 0,
-	King: 1,
-	Pawn: 2,
-	Knight: 3,
-	Bishop: 4,
-	Rook: 5,
-	Queen: 6,
-
 	// 9 is White king
 	// 14 is White queen
 	// 17 is Black king
 	// 22 is Black queen
-	White: 8,
-	Black: 16,
 
 	sameColor: (piece: number, color: Color) => {
-		if (piece === Piece.None) return false;
+		if (piece === PieceType.None) return false;
 		// black                       or  white
-		return (!!(piece & Piece.Black) && color == 'Black') || (!!(piece & Piece.White) && color == 'White');
+		let pieceColor = piece & PieceColor.Black ? "Black" : "White" 
+		return pieceColor === color;
 	},
 
 	/**
@@ -165,10 +156,10 @@ export const Piece = {
 	 * @param pieceTypeToCompare
 	 * @returns boolean
 	 */
-	isType: (piece: number, pieceTypeToCompare: number) => {
-		if (piece === Piece.None) return piece === pieceTypeToCompare;
-		return piece - Piece.Black === pieceTypeToCompare || piece - Piece.White === pieceTypeToCompare;
-	},
+		isType: (piece: number, pieceTypeToCompare: number) => {
+			if (piece === PieceType.None) return piece === pieceTypeToCompare;
+			return piece % 8 === pieceTypeToCompare;
+		},
 
 	/**
 	 * return vertical index
@@ -182,18 +173,23 @@ export const Piece = {
 	 * @param tileNumber
 	 * @returns 0-7
 	 */
-	getRank: (tileNumber: number) => tileNumber % 8
+	getRank: (tileNumber: number) => tileNumber % 8,
+
+	getPiece: (piece: number) => {
+		return piece % 8
+	}
 };
 
 
 export const generateMoves = (
 	currentBoardArray: number[], 
 	currentTurn: Color, 
-	currentFutureMoveList: Move[], 
 	currentCastlingRights: CastlingRightsType, 
 	currentEnPassantTarget:number|null, 
 	currentHalfMoveClock:number,
 	currentFullMoveList:number,
+
+	currentFutureMoveList: Move[], 
 	futureCheck:number
 ) : Move[] => {
 
@@ -205,13 +201,13 @@ export const generateMoves = (
 		// this piece turn
 		if(Piece.sameColor(piece, currentTurn)){
 			
-			if(Piece.isType(piece, Piece.Pawn)){
+			if(Piece.isType(piece, PieceType.Pawn)){
 				tempMoveList.push(...generatePawnMove(i, piece, currentBoardArray, currentEnPassantTarget))
 			}
-			else if(Piece.isType(piece, Piece.Knight)){
+			else if(Piece.isType(piece, PieceType.Knight)){
 				tempMoveList.push(...generateKnightMove(i, piece,  currentBoardArray))
 			}
-			else if(Piece.isType(piece, Piece.King)){
+			else if(Piece.isType(piece, PieceType.King)){
 				tempMoveList.push(...generateCastlingMove(i, piece, currentBoardArray, currentFutureMoveList ,currentCastlingRights))
 				tempMoveList.push(...generateSlidingMove(i, piece, currentBoardArray))
 			}
@@ -226,7 +222,7 @@ export const generateMoves = (
 		let {newBoardArray, newEnPassantTarget, newTurn, newCastlingRights, newHalfMoveClock, newFullMoveClock} = executeMove([...currentBoardArray], move, currentTurn,{...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock, currentFullMoveList)
 		
 		// Filter out movement that would result in king getting targetted
-		return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], newTurn, currentFutureMoveList, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], Piece.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
+		return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], newTurn, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, currentFutureMoveList, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], PieceType.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
 	})
 
 
@@ -269,11 +265,11 @@ export const generateCastlingMove = (
 
 				// Check for empty squares and correct rook
 				if (i > 0 && i < rookOffset) {
-					isValid = isValid && currentBoardArray[tileIndex + offset] === Piece.None;
+					isValid = isValid && currentBoardArray[tileIndex + offset] === PieceType.None;
 				} else if (i === rookOffset) {
 					isValid =
 						isValid &&
-						Piece.isType(currentBoardArray[tileIndex + offset], Piece.Rook) &&
+						Piece.isType(currentBoardArray[tileIndex + offset], PieceType.Rook) &&
 						Piece.sameColor(currentBoardArray[tileIndex + offset], friendlyColor);
 				}
 			}
@@ -324,11 +320,11 @@ export const generatePawnMove = (
 
 			if (currentEnPassantTarget !== targetTile) {
 				// Break out of the loop if diagonal space isnt opponent piece or the space is empty
-				if ((targetPiece === Piece.None || Piece.sameColor(targetPiece, friendlyColor)) && i !== 1)
+				if ((targetPiece === PieceType.None || Piece.sameColor(targetPiece, friendlyColor)) && i !== 1)
 					break;
 
 				// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendly
-				if (targetPiece !== Piece.None && (i === 1 || Piece.sameColor(targetPiece, friendlyColor)))
+				if (targetPiece !== PieceType.None && (i === 1 || Piece.sameColor(targetPiece, friendlyColor)))
 					break;
 			}
 
@@ -402,8 +398,8 @@ export const generateSlidingMove = (
 	let friendlyColor: Color = piece < 16 ? 'White' : 'Black';
 	let opponentColor: Color = piece < 16 ? 'Black' : 'White';
 
-	let startDirectionIndex = Piece.isType(piece, Piece.Bishop) ? 4 : 0;
-	let endDirectionIndex = Piece.isType(piece, Piece.Rook) ? 4 : 8;
+	let startDirectionIndex = Piece.isType(piece, PieceType.Bishop) ? 4 : 0;
+	let endDirectionIndex = Piece.isType(piece, PieceType.Rook) ? 4 : 8;
 
 	for (
 		let directionIndex = startDirectionIndex;
@@ -412,21 +408,21 @@ export const generateSlidingMove = (
 	) {
 		for (let j = 0; j < numberOfTilesToEdge[tileIndex][directionIndex]; j++) {
 			// if its a king
-			if (Piece.isType(piece, Piece.King) && j >= 1) break;
+			if (Piece.isType(piece, PieceType.King) && j >= 1) break;
 
 			let targetTile = tileIndex + direction[directionIndex] * (j + 1);
 
 			let targetPiece = currentBoardArray[targetTile];
 
 			// Same color piece
-			if (targetPiece !== Piece.None && Piece.sameColor(targetPiece, friendlyColor)) {
+			if (targetPiece !== PieceType.None && Piece.sameColor(targetPiece, friendlyColor)) {
 				break;
 			}
 
 			tempMoveList.push({ start: tileIndex, target: targetTile });
 
 			// Different color piece
-			if (targetPiece !== Piece.None && Piece.sameColor(targetPiece, opponentColor)) {
+			if (targetPiece !== PieceType.None && Piece.sameColor(targetPiece, opponentColor)) {
 				break;
 			}
 		}
@@ -450,8 +446,8 @@ export const executeMove = (
 
 	let pieceToMove = currentBoardArray[startTile];
 
-	let friendlyColor: Color = pieceToMove & Piece.White ? 'White' : 'Black';
-	let opponentColor: Color = pieceToMove & Piece.Black ? 'Black' : 'White';
+	let friendlyColor: Color = pieceToMove & PieceColor.White ? 'White' : 'Black';
+	let opponentColor: Color = pieceToMove & PieceColor.Black ? 'Black' : 'White';
 
 	let targetPiece = currentBoardArray[targetTile];
 
@@ -461,7 +457,7 @@ export const executeMove = (
 	let opponentCastlingRightsAddress = friendlyColor === 'White' ? [2, 3] : [0, 1];
 
 	// Add halfMove by one if it isnt a capture, reset to zero if it is a capture
-	currentHalfMoveClock = targetPiece === Piece.None ? ++currentHalfMoveClock : 0;
+	currentHalfMoveClock = targetPiece === PieceType.None ? ++currentHalfMoveClock : 0;
 
 	// Specialized move check
 
@@ -469,7 +465,7 @@ export const executeMove = (
 	/* -------------------------------------------------------------------------- */
 	/*                                    Pawn                                    */
 	/* -------------------------------------------------------------------------- */
-	if (Piece.isType(pieceToMove, Piece.Pawn)) {
+	if (Piece.isType(pieceToMove, PieceType.Pawn)) {
 		// Pawn capture reset half move clock
 		currentHalfMoveClock = 0;
 		if (pickedPiece) pieceToMove = pickedPiece;
@@ -483,7 +479,7 @@ export const executeMove = (
 		// Google en passant
 		else if (targetTile === currentEnPassantTarget) {
 			let holyHell = friendlyColor === 'White' ? 8 : -8;
-			currentBoardArray[targetTile + holyHell] = Piece.None;
+			currentBoardArray[targetTile + holyHell] = PieceType.None;
 		}
 	} 
 	
@@ -491,21 +487,21 @@ export const executeMove = (
 	/* -------------------------------------------------------------------------- */
 	/*                                    King                                    */
 	/* -------------------------------------------------------------------------- */
-	else if (Piece.isType(pieceToMove, Piece.King)) {
+	else if (Piece.isType(pieceToMove, PieceType.King)) {
 		/* -------------------------------------------------------------------------- */
 		/*                                  Castling                                  */
 		/* -------------------------------------------------------------------------- */
 		// Check if move is kingside castling
 		if (note?.[friendlyColor] === 'kingSide') {
 			currentBoardArray[startTile + 1] = currentBoardArray[startTile + 3];
-			currentBoardArray[startTile + 3] = Piece.None;
+			currentBoardArray[startTile + 3] = PieceType.None;
 
 			currentCastlingRights[castlingRightsAddress[0]] = false;
 		}
 		// Check if move is queenside castling
 		else if (note?.[friendlyColor] === 'queenSide') {
 			currentBoardArray[startTile - 1] = currentBoardArray[startTile - 4];
-			currentBoardArray[startTile - 4] = Piece.None;
+			currentBoardArray[startTile - 4] = PieceType.None;
 
 			currentCastlingRights[castlingRightsAddress[1]] = false;
 		}
@@ -519,7 +515,7 @@ export const executeMove = (
 	/* -------------------------------------------------------------------------- */
 	/*                                    Rook                                    */
 	/* -------------------------------------------------------------------------- */
-	else if (Piece.isType(pieceToMove, Piece.Rook)) {
+	else if (Piece.isType(pieceToMove, PieceType.Rook)) {
 		/* -------------------------------------------------------------------------- */
 		/*                             Castling Invalidate                            */
 		/* -------------------------------------------------------------------------- */
@@ -530,7 +526,7 @@ export const executeMove = (
 
 
 	// Revoke opponent castling rights if we captured a rook
-	if (Piece.isType(targetPiece, Piece.Rook)) {
+	if (Piece.isType(targetPiece, PieceType.Rook)) {
 		if (Piece.getRank(targetTile) === 7)
 			currentCastlingRights[opponentCastlingRightsAddress[0]] = false;
 		else if (Piece.getRank(targetTile) === 0)
@@ -539,7 +535,7 @@ export const executeMove = (
 
 	// Execute actual Moves
 	currentBoardArray[targetTile] = pieceToMove;
-	currentBoardArray[startTile] = Piece.None;
+	currentBoardArray[startTile] = PieceType.None;
 
 	
 	if(currentTurn === "Black")currentFullMoveClock++

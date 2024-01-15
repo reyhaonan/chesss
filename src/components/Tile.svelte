@@ -30,7 +30,7 @@
     </div>
   {/if}
   {#if highlightSelectedTile}
-    <div class="absolute inset-0 bg-red-900/30"></div>
+    <div class="absolute inset-0 bg-red-900/40"></div>
   {/if}
 
   <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">{debugIndex}</div> -->

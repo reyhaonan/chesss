@@ -31,6 +31,24 @@ export type Move = {
 	note?: any;
 };
 
+
+export enum PieceType {
+  None,
+  King,
+  Pawn,
+  Knight,
+  Bishop,
+  Rook,
+  Queen,
+}
+
+export enum PieceColor {
+  White = 8,
+  Black = 16,
+}
+
+
+
 export type Color = 'White' | 'Black';
 
 // white kingside, white queenside, black kingside, black queenside
@@ -49,6 +67,8 @@ export type BoardInfo = {
 	newFullMoveClock: number;
 };
 
+export type BoardInfoArray = [number[], Color, CastlingRightsType, number | null, number, number]
+
 export type Alphabet = "a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"
 
 export const alphabet: string[] = ["a","b","c","d","e","f","g","h"]
@@ -65,3 +85,13 @@ export type Num = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 export type AlgebraicNotation = `${Alphabet}${Num}`
 
 export const FENRegex = /^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([bw])\s([KQkq]{1,4})\s(-|[a-h][1-8])\s(\d+\s\d+)$/
+
+
+export const PieceCharLookup = {
+	1 : "K",
+	2: "P",
+	3: "N",
+	4: "B",
+	5: "R",
+	6: "Q",
+}

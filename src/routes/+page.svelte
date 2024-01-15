@@ -10,7 +10,7 @@
 					() => {
 						let moveToUse = moveList.find(move => move.start === selectedTile && move.target === i)
 						if(!!moveToUse)move(moveToUse)
-						else if(!Piece.isType(pawn, Piece.None))selectedTile = i
+						else if(!Piece.isType(pawn, PieceType.None))selectedTile = i
 						else selectedTile = -1
 					}
 				}
@@ -34,20 +34,20 @@
 		<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-20 h-80" style="top:{topOffset}px;left:{leftOffset}px">
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 
-			<button on:click={() => pickPiece(Piece.Queen + Piece[turn])}>
-				<img src={`/pawn_default/${Piece.Queen + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			<button on:click={() => pickPiece(PieceType.Queen + PieceColor[turn])}>
+				<img src={`/pawn_default/${PieceType.Queen + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
 			</button>
 
-			<button on:click={() => pickPiece(Piece.Knight + Piece[turn])}>
-				<img src={`/pawn_default/${Piece.Knight + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			<button on:click={() => pickPiece(PieceType.Knight + PieceColor[turn])}>
+				<img src={`/pawn_default/${PieceType.Knight + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
 			</button>
 
-			<button on:click={() => pickPiece(Piece.Rook + Piece[turn])}>
-				<img src={`/pawn_default/${Piece.Rook + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			<button on:click={() => pickPiece(PieceType.Rook + PieceColor[turn])}>
+				<img src={`/pawn_default/${PieceType.Rook + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
 			</button>
 
-			<button on:click={() => pickPiece(Piece.Bishop + Piece[turn])}>
-				<img src={`/pawn_default/${Piece.Bishop + Piece[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+			<button on:click={() => pickPiece(PieceType.Bishop + PieceColor[turn])}>
+				<img src={`/pawn_default/${PieceType.Bishop + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
 			</button>
 		</div>
 	</div>
@@ -76,20 +76,23 @@
 <script lang="ts">
 	import Board from "$components/Board.svelte";
 	import Tile from "$components/Tile.svelte";
-	import { convertFENToBoardArray, executeMove, generateCastlingMove, generateKnightMove, generateMoves, generatePawnMove, generateSlidingMove, isThreefoldRepetition, numberOfTilesToEdge, Piece } from "$lib/Engine";
-	import { direction, startingFEN, type Move, type Color, type CastlingRightsType, type BoardHistory } from "$lib/misc";
-
+	import { convertFENToBoardArray, executeMove, generateMoves, isThreefoldRepetition, Piece } from "$lib/Engine";
+	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType } from "$lib/misc";
+	import boardInfo from "$stores/BoardInfo";
+	import moveHistory from "$stores/MoveHistory";
 
 	// let boardArray = convertFENToBoardArray("3k4/7p/8/8/8/8/P7/3K4 w - - 0 1")
-	let [
+	$boardInfo = convertFENToBoardArray('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e4 0 1')
+
+	$:[
 		boardArray, 
 		turn, 
 		castlingRights, 
 		enPassantTarget, 
 		halfMoveClock, 
 		fullMoveClock 
-	] = convertFENToBoardArray('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e4 0 1')
-
+	] = $boardInfo
+	
 	let moveList:Move[] = []
 	
 	let threatMoveList: Move[] = []
@@ -103,23 +106,21 @@
 
 	let lastMove:number[] = []
 
-	// i store only 6 of these for threefold checks
+	// i store only 10 of these for threefold checks
 	let boardArrayHistory: BoardHistory[] = [[boardArray, castlingRights, enPassantTarget]]
 
 	$: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
 
 
 	
-	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White", [],  [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, 1)
-	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, threatMoveList, [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, 1)
-
-	$: moveList, console.log("moveList", moveList)
+	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White",  [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, [], 1)
+	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList, 1)
 	// $: if()alert("draw")
 
 	
 	$: if(halfMoveClock >= 100)alert("draw")
 	$: if(moveList.length === 0){
-		if(threatMoveList.some(move => Piece.isType(boardArray[move.target], Piece.King))){
+		if(threatMoveList.some(move => Piece.isType(boardArray[move.target], PieceType.King))){
 			alert(turn + " is lost")
 		}else{
 			alert("draw")
@@ -180,7 +181,7 @@
 		
 		let pickedPiece:number | undefined;
 
-		if(Piece.getFile(targetTile) === endOfLine && Piece.isType(boardArray[selectedTile], Piece.Pawn)){
+		if(Piece.getFile(targetTile) === endOfLine && Piece.isType(boardArray[selectedTile], PieceType.Pawn)){
 			try{
 				pickedPiece = await openPickerOverlay(targetTile)
 			}catch{
@@ -194,6 +195,22 @@
 		console.log("surprise ", newCastlingRights)
 
 		lastMove = [startTile, targetTile]
+
+		$moveHistory = [...$moveHistory, {
+				newBoardArray, 
+				newTurn, 
+				newCastlingRights, 
+				newEnPassantTarget, 
+				newHalfMoveClock, 
+				newFullMoveClock,
+				lastMove,
+				turn,
+				startTile: move.start, 
+				targetTile: move.target,
+				pieceToMove: boardArray[move.start],
+				pieceTarget: boardArray[move.target]
+			}
+		]
 
 		enPassantTarget = newEnPassantTarget;
 
