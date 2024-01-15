@@ -55,6 +55,10 @@ export const alphabet: string[] = ["a","b","c","d","e","f","g","h"]
 
 export const rankLookup:{[key:string]:number} = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
 
+export const filesLookup:{[key:string | number]:number} = { 8: 0, 7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7 };
+
+export const fileArray = [8, 7, 6, 5, 4, 3, 2, 1]
+
 
 export type Num = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 

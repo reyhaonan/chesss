@@ -6,8 +6,8 @@
 style="background-image: url('https://images.chesscomfiles.com/chess-themes/boards/green/200.png');">
   <!-- Indication row -->
   <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-semibold">
-    {#each Array(8) as num, i}
-      <div class="pl-1">{i + 1}</div>
+    {#each fileArray as num}
+      <div class="pl-1">{num}</div>
     {/each}
   </div>
   <div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 text-slate-900 font-semibold">
@@ -29,7 +29,7 @@ style="background-image: url('https://images.chesscomfiles.com/chess-themes/boar
 
 
 <script lang="typescript">
-	import { alphabet } from "$lib/misc";
+	import { alphabet, fileArray, filesLookup } from "$lib/misc";
 
   // 8x8 2d array
   var board = [...Array(8)].map(e => Array(8));

@@ -1,4 +1,4 @@
-import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, } from './misc';
+import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, filesLookup, fileArray, } from './misc';
 
 // export const generateMoves = (piece: ) => {}
 
@@ -72,7 +72,7 @@ export const convertFENToBoardArray = (FEN: string):[number[], Color, CastlingRi
 
 	// TODO: Convert position to number
 	// En Passant
-	newEnPassantTarget = enPassantTarget === "-"? null: 0
+	newEnPassantTarget = enPassantTarget === "-"? null: convertAlgebraicNotationToNumber(enPassantTarget)
 
 	// Half Move Clock
 	newHalfMoveClock = Number(halfMoveClock)
@@ -91,14 +91,14 @@ export const convertNumberToAlgebraicNotation = (coord: number): string => {
     throw new Error("Invalid board coordinate: " + coord);
   }
 
-	return `${alphabet[rank]}${(file + 1)}`
+	return `${alphabet[rank]}${(fileArray[file])}`
 }
 
 export const convertAlgebraicNotationToNumber = (coord: string):number => {
 	const [rankChar, fileStr] = coord;
 
   const rank = rankLookup[rankChar.toLowerCase()];
-  const file = Number(fileStr) - 1;
+  const file = filesLookup[fileStr];
 
   if (rank === undefined || isNaN(file)) {
     throw new Error("Invalid algebraic notation: " + coord);

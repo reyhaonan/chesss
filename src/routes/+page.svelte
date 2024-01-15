@@ -87,7 +87,14 @@
 
 
 	// let boardArray = convertFENToBoardArray("3k4/7p/8/8/8/8/P7/3K4 w - - 0 1")
-	let [boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock ] = convertFENToBoardArray(startingFEN)
+	let [
+		boardArray, 
+		turn, 
+		castlingRights, 
+		enPassantTarget, 
+		halfMoveClock, 
+		fullMoveClock 
+	] = convertFENToBoardArray('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e4 0 1')
 
 	let moveList:Move[] = []
 	
