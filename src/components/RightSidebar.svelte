@@ -1,7 +1,10 @@
 <div class="col-span-3 bg-slate-800 text-neutral-50 px-8 py-16">
-  <div class="moveHistory grid grid-cols-2 bg-slate-700">
-    {#each $moveHistory as move}
-      <div class="text-xl p-2 font-semibold">{convertMoveToAlgebraicNotation(move)}</div>
+  <div class="moveHistory grid grid-cols-8 bg-slate-700">
+    {#each $moveHistory as move, i}
+      {#if i % 2 === 0}
+        <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-600">{(i / 2) + 1}</div>
+      {/if}
+      <button class="px-3 py-1 font-semibold col-span-3 last:bg-violet-800/60 text-left">{convertMoveToAlgebraicNotation(move)}</button>
     {/each}
   </div>
 </div>
@@ -22,7 +25,7 @@
     let targetNotation = convertNumberToAlgebraicNotation(move.targetTile)
 
     let isCapture = false
-    if(!!move.pieceTarget)isCapture = true
+    if(!!move.pieceTarget || move.note === "enPassant")isCapture = true
 
 
     let shouldSpecifyFiles = move.moveList
@@ -35,9 +38,9 @@
     if(piece === "P")piece = ""
     if(shouldSpecifyFiles)files = alphabet[Piece.getFile(move.startTile)]
 
-    let isACheck = false
+    let isACheck = move.threatListToOpponent.some(e => Piece.isType(move.newBoardArray.get(e.target), PieceType.King))
 
-    return `${piece}${files}${isCapture ? "x" : "" }${targetNotation}${isACheck?"+":""}`
+    return `${piece}${files}${isCapture ? "x" : "" }${targetNotation}${move.isCheckMate?"#":isACheck?"+":""}`
   }
 
 </script>

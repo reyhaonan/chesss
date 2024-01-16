@@ -81,8 +81,8 @@
 	import boardInfo from "$stores/BoardInfo";
 	import moveHistory from "$stores/MoveHistory";
 
-	// let boardArray = convertFENToBoardArray("3k4/7p/8/8/8/8/P7/3K4 w - - 0 1")
 	$boardInfo = convertFENToBoardArray(startingFEN)
+	// $boardInfo = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1")
 
 	$:[
 		boardArray, 
@@ -94,8 +94,6 @@
 	] = $boardInfo
 
 	$: console.log("BO", $boardInfo[0], boardArray.get(1))
-
-	let iterable: number[] = Array(64)
 
 	let moveList:Move[] = []
 	
@@ -119,12 +117,14 @@
 	
 	$: boardArray, threatMoveList = generateMoves(boardArray, turn === "White"?"Black":"White",  castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, [])
 	$: threatMoveList, moveList =  generateMoves(boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList)
-
+	$: if($moveHistory.length > 0)$moveHistory[$moveHistory.length - 1].threatListToOpponent = threatMoveList
+	
 	
 	$: if(halfMoveClock >= 100)alert("draw")
 	$: if(moveList.length === 0){
 		if(threatMoveList.some(move => Piece.isType(boardArray.get(move.target)!, PieceType.King))){
 			alert(turn + " is lost")
+			$moveHistory[$moveHistory.length - 1].isCheckMate = true
 		}else{
 			alert("draw")
 		}
@@ -205,7 +205,10 @@
 				note:move.note,
 				pieceToMove: boardArray.get(startTile)!,
 				pieceTarget: boardArray.get(targetTile)!,
-				moveList: [...moveList]
+				moveList: [...moveList],
+				// Leaving this to sideeffect
+				threatListToOpponent: [],
+				isCheckMate: false
 			}
 		]
 

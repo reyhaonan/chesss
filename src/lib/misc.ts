@@ -50,8 +50,6 @@ export enum PieceColor {
   Black = 16,
 }
 
-
-
 export type Color = 'White' | 'Black';
 
 // white kingside, white queenside, black kingside, black queenside
@@ -100,7 +98,7 @@ export const FENRegex = /^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([b
 
 
 export const PieceCharLookup: {[key: number]: string} = {
-	1 : "K",
+	1: "K",
 	2: "P",
 	3: "N",
 	4: "B",
