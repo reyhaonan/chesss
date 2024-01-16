@@ -20,9 +20,9 @@
 
   {#if highlightForMoveSuggestion}
     {#if !!pieceNumber}
-      <div class="w-full border-red-900/30 border-8 rounded-full aspect-square absolute-center"></div>
+      <div class="w-11/12 border-red-900/30 border-[6px] rounded-full aspect-square absolute-center"></div>
     {:else}
-      <div class="w-6 bg-red-900/30 rounded-full aspect-square absolute-center"></div>
+      <div class="w-1/3 bg-red-900/30 rounded-full aspect-square absolute-center"></div>
     {/if}
   {:else if highlightLastMove}
     <div class="absolute inset-0 bg-amber-500/40">

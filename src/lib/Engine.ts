@@ -207,7 +207,7 @@ export const generateMoves = (
 	currentFullMoveList:number,
 
 	currentFutureMoveList: Move[], 
-	futureCheck:number
+	futureCheck:number = 1
 ) : Move[] => {
 
 	let tempMoveList:Move[] = []
