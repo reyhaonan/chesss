@@ -120,8 +120,8 @@
 
 
 	
-	$: boardArray, threatMoveList = generateMoves(boardArray, turn === "White"?"Black":"White",  [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, [], 1)
-	$: threatMoveList, moveList =  generateMoves(boardArray, turn, [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList, 1)
+	$: boardArray, threatMoveList = generateMoves(boardArray, turn === "White"?"Black":"White",  castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, [], 1)
+	$: threatMoveList, moveList =  generateMoves(boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList, 1)
 	// $: if()alert("draw")
 
 	
@@ -194,7 +194,7 @@
 			}
 		}
 
-		let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock, newFullMoveClock} = executeMove(boardArray, move, turn,[...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, pickedPiece  )
+		let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock, newFullMoveClock} = executeMove(boardArray, move, turn,castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, pickedPiece  )
 
 		console.log("surprise ", newCastlingRights)
 
@@ -229,7 +229,7 @@
 		castlingRights = newCastlingRights;
 
 		if(boardArrayHistory.length >= 10)boardArrayHistory.shift()
-		boardArrayHistory.push([newBoardArray, [...newCastlingRights], newEnPassantTarget])
+		boardArrayHistory.push([newBoardArray, newCastlingRights, newEnPassantTarget])
 
 		boardArrayHistory = boardArrayHistory
 

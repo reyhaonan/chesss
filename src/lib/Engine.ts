@@ -11,7 +11,16 @@ export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 	const boardArray = new Map<number, number>();
 
 	let newTurn: Color,
-		newCastlingRights: CastlingRightsType = [false, false, false, false], 
+		newCastlingRights: CastlingRightsType = {
+			White: {
+				kingSide: false,
+				queenSide: false,
+			},
+			Black: {
+				kingSide: false,
+				queenSide: false,
+			}
+		}, 
 		newEnPassantTarget: number | null,
 		newHalfMoveClock: number,
 		newFullMoveClock: number
@@ -68,13 +77,13 @@ export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 	for(const char of castlingRights){
 		switch(char){
 			case 'K':
-					newCastlingRights[0] = true
+				newCastlingRights.White.kingSide = true
 			case 'Q':
-					newCastlingRights[1] = true
+				newCastlingRights.White.queenSide = true
 			case 'k':
-					newCastlingRights[2] = true
+				newCastlingRights.Black.kingSide = true
 			case 'q':
-					newCastlingRights[3] = true
+				newCastlingRights.Black.queenSide = true
 		}
 	}
 
@@ -204,6 +213,7 @@ export const generateMoves = (
 	let tempMoveList:Move[] = []
 
 	currentBoardArray = _.cloneDeep(currentBoardArray)
+	currentCastlingRights = _.cloneDeep(currentCastlingRights)
 
 	for(let i = 0;i < 64;i++){
 		let piece = currentBoardArray.get(i);
@@ -234,7 +244,7 @@ export const generateMoves = (
 		
 		// Filter out movement that would result in king getting targetted
 		return move.target >= 0 && move.target < 64 && 
-		!generateMoves(newBoardArray, newTurn, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, currentFutureMoveList, --futureCheck)
+		!generateMoves(newBoardArray, newTurn, newCastlingRights, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, currentFutureMoveList, --futureCheck)
 			.some(move => Piece.isType(newBoardArray.get(move.target), PieceType.King) && Piece.sameColor(newBoardArray.get(move.target), currentTurn))
 	})
 
@@ -256,16 +266,13 @@ export const generateCastlingMove = (
 
 	const tempMoveList: Move[] = [];
 
-	let castlingSide: [number, number, number][] = [
-		[0, 1, 3],
-		[1, -1, 4]
+	let castlingSide: ["kingSide" | "queenSide", number, number][] = [
+		["kingSide", 1, 3],
+		["queenSide", -1, 4]
 	];
-
-	let castlingRightsAddress = friendlyColor === 'White' ? [0, 1] : [2, 3];
-
 	// Combine kingside and queenside checks for efficiency
 	for (const [side, direction, rookOffset] of castlingSide) {
-		if (currentCastlingRights[castlingRightsAddress[side]]) {
+		if (currentCastlingRights[friendlyColor][side]) {
 			let isValid = true;
 
 			for (let i = 0; i < rookOffset + 1 && isValid; i++) {
@@ -458,6 +465,7 @@ export const executeMove = (
 	
 
 	currentBoardArray = _.cloneDeep(currentBoardArray)
+	currentCastlingRights = _.cloneDeep(currentCastlingRights)
 
 	let { start: startTile, target: targetTile, note } = move;
 
@@ -467,8 +475,6 @@ export const executeMove = (
 
 	let enPassantPotential = null;
 
-	let castlingRightsAddress = currentTurn === 'White' ? [0, 1] : [2, 3];
-	let opponentCastlingRightsAddress = currentTurn === 'White' ? [2, 3] : [0, 1];
 
 	// Add halfMove by one if it isnt a capture, reset to zero if it is a capture
 	currentHalfMoveClock = !targetPiece ? ++currentHalfMoveClock : 0;
@@ -506,24 +512,26 @@ export const executeMove = (
 		/*                                  Castling                                  */
 		/* -------------------------------------------------------------------------- */
 		// Check if move is kingside castling
-		if (note?.[currentTurn] === 0) {
+		if (note?.[currentTurn] === "kingSide") {
 			currentBoardArray.set(startTile + 1, currentBoardArray.get(startTile + 3)!);
 			currentBoardArray.delete(startTile + 3);
 
-			currentCastlingRights[castlingRightsAddress[0]] = false;
+			currentCastlingRights[currentTurn].kingSide = false;
 		}
 		// Check if move is queenside castling
-		else if (note?.[currentTurn] === 1) {
+		else if (note?.[currentTurn] === "queenSide") {
 			
 			currentBoardArray.set(startTile - 1, currentBoardArray.get(startTile - 4)!);
 			currentBoardArray.delete(startTile - 4);
 
-			currentCastlingRights[castlingRightsAddress[1]] = false;
+			currentCastlingRights[currentTurn].queenSide = false;
 		}
 		// Neither? then provoke all castling side
 		else {
-			currentCastlingRights[castlingRightsAddress[0]] = false;
-			currentCastlingRights[castlingRightsAddress[1]] = false;
+			currentCastlingRights[currentTurn] = {
+				kingSide: false,
+				queenSide: false,
+			}
 		}
 	} 
 	
@@ -534,18 +542,17 @@ export const executeMove = (
 		/* -------------------------------------------------------------------------- */
 		/*                             Castling Invalidate                            */
 		/* -------------------------------------------------------------------------- */
-		if (Piece.getRank(startTile) === 7) currentCastlingRights[castlingRightsAddress[0]] = false;
-		else if (Piece.getRank(startTile) === 0)
-			currentCastlingRights[castlingRightsAddress[1]] = false;
+		if (Piece.getRank(startTile) === 7) currentCastlingRights[currentTurn].kingSide = false;
+		else if (Piece.getRank(startTile) === 0)currentCastlingRights[currentTurn].queenSide = false;
 	}
 
 
 	// Revoke opponent castling rights if we captured a rook
 	if (Piece.isType(targetPiece, PieceType.Rook)) {
 		if (Piece.getRank(targetTile) === 7)
-			currentCastlingRights[opponentCastlingRightsAddress[0]] = false;
+			currentCastlingRights[currentTurn === "White"?"Black":"White"].kingSide = false;
 		else if (Piece.getRank(targetTile) === 0)
-			currentCastlingRights[opponentCastlingRightsAddress[1]] = false;
+			currentCastlingRights[currentTurn === "White"?"Black":"White"].queenSide = false;
 	}
 
 	// Execute actual Moves

@@ -55,7 +55,16 @@ export enum PieceColor {
 export type Color = 'White' | 'Black';
 
 // white kingside, white queenside, black kingside, black queenside
-export type CastlingRightsType = [boolean, boolean, boolean, boolean];
+export type CastlingRightsType = {
+	White: {
+		kingSide: boolean;
+		queenSide: boolean;
+	},
+	Black: {
+		kingSide: boolean;
+		queenSide: boolean;
+	}
+}
 
 
 export type BoardHistory = [Map<number, number>, CastlingRightsType, number | null]
