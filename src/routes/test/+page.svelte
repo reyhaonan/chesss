@@ -10,7 +10,7 @@
 		</li>
 	{/each}
 
-	<input type="number" min="0" max="10" bind:value={DEPTH} class="bg-transparent rounded-md border border=neutral-50 mt-32 p-4">
+	<input type="number" min="0" max="8" bind:value={DEPTH} class="bg-transparent rounded-md border border=neutral-50 mt-32 p-4">
 	<button disabled={typeof DEPTH !== "number" || DEPTH < 1 || DEPTH > 8} on:click={performTest} class="p-4 bg-slate-50 disabled:bg-slate-600 rounded-md mt-8 text-slate-900">Perform Test with {DEPTH ?? "Invalid"} depth</button>
 
 </div>
@@ -82,7 +82,7 @@
 			// tambah
 			counter[id] += newMov.length
 
-			if(nextDepth == 0)continue;
+			if(nextDepth == 1)continue;
 			
 			countTotalMove(nextDepth, nextId, newMov, {
 				currentBoardArray:newBoardArray,
