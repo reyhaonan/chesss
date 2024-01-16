@@ -1,4 +1,4 @@
-import { type Move, type CastlingRightsType, PieceType, direction, numberOfTilesToEdge } from "./misc";
+import { type Move, type CastlingRightsType, PieceType, direction, numberOfTilesToEdge, type Color } from "./misc";
 import { Piece } from "$lib/Piece";
 
 export const generateCastlingMove = (

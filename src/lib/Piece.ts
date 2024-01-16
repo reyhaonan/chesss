@@ -1,4 +1,4 @@
-import { PieceColor } from "./misc";
+import { PieceColor, type Color } from "./misc";
 
 export const Piece = {
 	// 9 is White king
