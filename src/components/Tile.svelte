@@ -11,7 +11,7 @@
 >
   {#if !!pieceNumber}
     <img src={`/pawn_default/${pieceNumber}.svg`} 
-    class="select-none w-16 z-20 cursor-pointer"
+    class="select-none w-4/5 z-20 cursor-pointer"
     alt="" draggable={correctTurn?true:false}
     on:dragstart
     on:dragend

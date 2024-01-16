@@ -53,7 +53,7 @@
 		</div>
 	</div>
 
-	<div class="absolute top-full text-neutral-50">
+	<!-- <div class="absolute top-full text-neutral-50">
 		<div class="font-bold text-2xl">Game param</div>
 		<li>
 			Castling rights(KQkq): {JSON.stringify(castlingRights)}
@@ -69,7 +69,7 @@
 		</li>
 		<li>
 		</li>
-		<button on:click={moveRandomly}>MOVE {turn}</button></div>
+		<button on:click={moveRandomly}>MOVE {turn}</button></div> -->
 	<!-- {/if} -->
 </Board>
 
@@ -122,21 +122,18 @@
 	
 	$: boardArray, threatMoveList = generateMoves(boardArray, turn === "White"?"Black":"White",  castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, [], 1)
 	$: threatMoveList, moveList =  generateMoves(boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList, 1)
-	// $: if()alert("draw")
 
 	
-	// $: if(halfMoveClock >= 100)alert("draw")
-	// $: if(moveList.length === 0){
-	// 	if(threatMoveList.some(move => Piece.isType(boardArray.get(move.target)!, PieceType.King))){
-	// 		alert(turn + " is lost")
-	// 	}else{
-	// 		alert("draw")
-	// 	}
-	// }
+	$: if(halfMoveClock >= 100)alert("draw")
+	$: if(moveList.length === 0){
+		if(threatMoveList.some(move => Piece.isType(boardArray.get(move.target)!, PieceType.King))){
+			alert(turn + " is lost")
+		}else{
+			alert("draw")
+		}
+	}
 
 	// $: turn, boardArray, moveList, moveRandomly()
-
-
 
 	const moveRandomly = () => {
 		let selectedMove = moveList[Math.floor(Math.random() * moveList.length)]
@@ -145,15 +142,11 @@
 		move(selectedMove)
 	}
 
-
-
-
 	const pickPiece = (pieceNumber: number) => {
 		resolve(pieceNumber);
 		piecePickerIsOpen = false
 	}
 
-	
 	let resolve: (pieceNumber: number) => void;
 	let reject: () => void;
 
@@ -168,7 +161,6 @@
 		})
 	}
 	
-
 	// Move fn
 	const move = async (move: Move) => {
 		

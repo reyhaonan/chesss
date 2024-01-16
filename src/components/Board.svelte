@@ -2,7 +2,7 @@
 <!-- Graphical only -->
 
 <!-- thank you chess.com -->
-<div class="w-[640px] aspect-square rounded-md relative bg-cover bg-center" 
+<div class="w-5/6 aspect-square rounded-md relative bg-cover bg-center" 
 style="background-image: url('https://images.chesscomfiles.com/chess-themes/boards/green/200.png');">
   <!-- Indication row -->
   <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-bold">
