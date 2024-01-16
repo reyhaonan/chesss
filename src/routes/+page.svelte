@@ -1,8 +1,9 @@
 
 <Board>
 	<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
-		{#each boardArray as pawn, i}
-			<Tile pieceNumber={pawn} 
+		{#each [...Array(64)] as el, i}
+			<Tile 
+				pieceNumber={boardArray.get(i)} 
 				highlightLastMove={lastMove.some(e => e === i)}
 				highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
 				highlightSelectedTile={selectedTile === i}
@@ -10,7 +11,7 @@
 					() => {
 						let moveToUse = moveList.find(move => move.start === selectedTile && move.target === i)
 						if(!!moveToUse)move(moveToUse)
-						else if(!Piece.isType(pawn, PieceType.None))selectedTile = i
+						else if(!Piece.isType(boardArray.get(i), PieceType.None))selectedTile = i
 						else selectedTile = -1
 					}
 				}
@@ -66,6 +67,8 @@
 		<li>
 			Full Move: {fullMoveClock}
 		</li>
+		<li>
+		</li>
 		<button on:click={moveRandomly}>MOVE {turn}</button></div>
 	<!-- {/if} -->
 </Board>
@@ -82,7 +85,7 @@
 	import moveHistory from "$stores/MoveHistory";
 
 	// let boardArray = convertFENToBoardArray("3k4/7p/8/8/8/8/P7/3K4 w - - 0 1")
-	$boardInfo = convertFENToBoardArray('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e4 0 1')
+	$boardInfo = convertFENToBoardArray(startingFEN)
 
 	$:[
 		boardArray, 
@@ -92,7 +95,11 @@
 		halfMoveClock, 
 		fullMoveClock 
 	] = $boardInfo
-	
+
+	$: console.log("BO", $boardInfo[0], boardArray.get(1))
+
+	let iterable: number[] = Array(64)
+
 	let moveList:Move[] = []
 	
 	let threatMoveList: Move[] = []
@@ -109,23 +116,23 @@
 	// i store only 10 of these for threefold checks
 	let boardArrayHistory: BoardHistory[] = [[boardArray, castlingRights, enPassantTarget]]
 
-	$: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
+	// $: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
 
 
 	
-	$: boardArray, threatMoveList = generateMoves([...boardArray], turn === "White"?"Black":"White",  [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, [], 1)
-	$: threatMoveList, moveList =  generateMoves([...boardArray], turn, [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList, 1)
+	$: boardArray, threatMoveList = generateMoves(boardArray, turn === "White"?"Black":"White",  [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, [], 1)
+	$: threatMoveList, moveList =  generateMoves(boardArray, turn, [...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList, 1)
 	// $: if()alert("draw")
 
 	
-	$: if(halfMoveClock >= 100)alert("draw")
-	$: if(moveList.length === 0){
-		if(threatMoveList.some(move => Piece.isType(boardArray[move.target], PieceType.King))){
-			alert(turn + " is lost")
-		}else{
-			alert("draw")
-		}
-	}
+	// $: if(halfMoveClock >= 100)alert("draw")
+	// $: if(moveList.length === 0){
+	// 	if(threatMoveList.some(move => Piece.isType(boardArray.get(move.target)!, PieceType.King))){
+	// 		alert(turn + " is lost")
+	// 	}else{
+	// 		alert("draw")
+	// 	}
+	// }
 
 	// $: turn, boardArray, moveList, moveRandomly()
 
@@ -173,7 +180,7 @@
 
 		console.log("MOVED ONCE")
 		
-		let friendlyColor: Color = boardArray[selectedTile] < 16? "White":"Black"
+		let friendlyColor: Color = boardArray.get(selectedTile)! < 16? "White":"Black"
 		/* -------------------------------------------------------------------------- */
 		/*                                  Promotion                                 */
 		/* -------------------------------------------------------------------------- */
@@ -181,7 +188,7 @@
 		
 		let pickedPiece:number | undefined;
 
-		if(Piece.getFile(targetTile) === endOfLine && Piece.isType(boardArray[selectedTile], PieceType.Pawn)){
+		if(Piece.getFile(targetTile) === endOfLine && Piece.isType(boardArray.get(startTile)!, PieceType.Pawn)){
 			try{
 				pickedPiece = await openPickerOverlay(targetTile)
 			}catch{
@@ -190,7 +197,7 @@
 			}
 		}
 
-		let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock, newFullMoveClock} = executeMove([...boardArray], move, turn,[...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, pickedPiece  )
+		let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock, newFullMoveClock} = executeMove(boardArray, move, turn,[...castlingRights], enPassantTarget, halfMoveClock, fullMoveClock, pickedPiece  )
 
 		console.log("surprise ", newCastlingRights)
 
@@ -207,8 +214,8 @@
 				turn,
 				startTile: move.start, 
 				targetTile: move.target,
-				pieceToMove: boardArray[move.start],
-				pieceTarget: boardArray[move.target]
+				pieceToMove: boardArray.get(startTile)!,
+				pieceTarget: boardArray.get(targetTile)!
 			}
 		]
 
@@ -225,16 +232,17 @@
 		castlingRights = newCastlingRights;
 
 		if(boardArrayHistory.length >= 10)boardArrayHistory.shift()
-		boardArrayHistory.push([[...newBoardArray], [...newCastlingRights], newEnPassantTarget])
+		boardArrayHistory.push([newBoardArray, [...newCastlingRights], newEnPassantTarget])
 
 		boardArrayHistory = boardArrayHistory
 
-		boardArray = newBoardArray;
+		boardArray = new Map(newBoardArray);
 	}
 
 
 
 	$: threatMoveList, console.log("threatMoveList", threatMoveList)
+	$: moveList, console.log("moveList", moveList)
 
 
 </script>

@@ -1,5 +1,5 @@
 import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, filesLookup, fileArray, type BoardInfoArray, PieceType, PieceColor, } from './misc';
-
+import _ from 'lodash';
 // export const generateMoves = (piece: ) => {}
 
 export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
@@ -8,7 +8,7 @@ export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 		throw new Error("Invalid FEN String: " + FEN)
 	}
 
-	const boardArray: number[] = [];
+	const boardArray = new Map<number, number>();
 
 	let newTurn: Color,
 		newCastlingRights: CastlingRightsType = [false, false, false, false], 
@@ -20,6 +20,7 @@ export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 
 	// 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
+	let startingIndex = 0
 	// Board Array
 	boardInfo
 		.split('/')
@@ -29,29 +30,36 @@ export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 
 				switch (piece.toLowerCase()) {
 					case 'k':
-						boardArray.push(PieceType.King + color);
+						boardArray.set(startingIndex, PieceType.King + color);
+						startingIndex++;
 						break;
 					case 'p':
-						boardArray.push(PieceType.Pawn + color);
+						boardArray.set(startingIndex, PieceType.Pawn + color);
+						startingIndex++;
 						break;
 					case 'n':
-						boardArray.push(PieceType.Knight + color);
+						boardArray.set(startingIndex, PieceType.Knight + color);
+						startingIndex++;
 						break;
 					case 'b':
-						boardArray.push(PieceType.Bishop + color);
+						boardArray.set(startingIndex, PieceType.Bishop + color);
+						startingIndex++;
 						break;
 					case 'r':
-						boardArray.push(PieceType.Rook + color);
+						boardArray.set(startingIndex, PieceType.Rook + color);
+						startingIndex++;
 						break;
 					case 'q':
-						boardArray.push(PieceType.Queen + color);
+						boardArray.set(startingIndex, PieceType.Queen + color);
+						startingIndex++;
 						break;
-
 					default:
-						boardArray.push(...Array(Number(piece)).fill(PieceType.None));
+						startingIndex += Number(piece)
 				}
 			});
 		});
+
+		console.log("BO RESULT", _.cloneDeep(boardArray))
 
 	// Turn
 	newTurn = turn === "w" ? "White":"Black"
@@ -80,7 +88,7 @@ export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 	// Full Move Clock
 	newFullMoveClock = Number(fullMoveClock)
 
-	return [boardArray, newTurn, newCastlingRights, newEnPassantTarget, newHalfMoveClock, newFullMoveClock];
+	return [_.cloneDeep(boardArray), newTurn, newCastlingRights, newEnPassantTarget, newHalfMoveClock, newFullMoveClock];
 };
 
 export const convertNumberToAlgebraicNotation = (coord: number): string => {
@@ -143,8 +151,8 @@ export const Piece = {
 	// 17 is Black king
 	// 22 is Black queen
 
-	sameColor: (piece: number, color: Color) => {
-		if (piece === PieceType.None) return false;
+	sameColor: (piece: number | undefined, color: Color) => {
+		if (!piece) return false;
 		// black                       or  white
 		let pieceColor = piece & PieceColor.Black ? "Black" : "White" 
 		return pieceColor === color;
@@ -156,8 +164,8 @@ export const Piece = {
 	 * @param pieceTypeToCompare
 	 * @returns boolean
 	 */
-		isType: (piece: number, pieceTypeToCompare: number) => {
-			if (piece === PieceType.None) return piece === pieceTypeToCompare;
+		isType: (piece: number| undefined, pieceTypeToCompare: number) => {
+			if (!piece) return piece === pieceTypeToCompare;
 			return piece % 8 === pieceTypeToCompare;
 		},
 
@@ -182,7 +190,7 @@ export const Piece = {
 
 
 export const generateMoves = (
-	currentBoardArray: number[], 
+	currentBoardArray: Map<number, number>, 
 	currentTurn: Color, 
 	currentCastlingRights: CastlingRightsType, 
 	currentEnPassantTarget:number|null, 
@@ -195,11 +203,14 @@ export const generateMoves = (
 
 	let tempMoveList:Move[] = []
 
+	currentBoardArray = _.cloneDeep(currentBoardArray)
+
 	for(let i = 0;i < 64;i++){
-		let piece = currentBoardArray[i];
+		let piece = currentBoardArray.get(i);
 		
+
 		// this piece turn
-		if(Piece.sameColor(piece, currentTurn)){
+		if(!!piece && Piece.sameColor(piece, currentTurn)){
 			
 			if(Piece.isType(piece, PieceType.Pawn)){
 				tempMoveList.push(...generatePawnMove(i, piece, currentBoardArray, currentEnPassantTarget))
@@ -219,10 +230,12 @@ export const generateMoves = (
 
 	if(futureCheck > 0)tempMoveList = tempMoveList.filter((move) => {
 		
-		let {newBoardArray, newEnPassantTarget, newTurn, newCastlingRights, newHalfMoveClock, newFullMoveClock} = executeMove([...currentBoardArray], move, currentTurn,{...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock, currentFullMoveList)
+		let {newBoardArray, newEnPassantTarget, newTurn, newCastlingRights, newHalfMoveClock, newFullMoveClock} = executeMove(currentBoardArray, move, currentTurn,{...currentCastlingRights}, currentEnPassantTarget, currentHalfMoveClock, currentFullMoveList)
 		
 		// Filter out movement that would result in king getting targetted
-		return move.target >= 0 && move.target < 64 && !generateMoves([...newBoardArray], newTurn, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, currentFutureMoveList, --futureCheck).some(move => Piece.isType(newBoardArray[move.target], PieceType.King) && Piece.sameColor(newBoardArray[move.target], currentTurn))
+		return move.target >= 0 && move.target < 64 && 
+		!generateMoves(newBoardArray, newTurn, {...newCastlingRights}, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, currentFutureMoveList, --futureCheck)
+			.some(move => Piece.isType(newBoardArray.get(move.target), PieceType.King) && Piece.sameColor(newBoardArray.get(move.target), currentTurn))
 	})
 
 
@@ -235,7 +248,7 @@ export const generateMoves = (
 export const generateCastlingMove = (
 	tileIndex: number,
 	piece: number,
-	currentBoardArray: number[],
+	currentBoardArray: Map<number, number>,
 	currentThreatMoveList: Move[],
 	currentCastlingRights: CastlingRightsType
 ): Move[] => {
@@ -265,12 +278,12 @@ export const generateCastlingMove = (
 
 				// Check for empty squares and correct rook
 				if (i > 0 && i < rookOffset) {
-					isValid = isValid && currentBoardArray[tileIndex + offset] === PieceType.None;
+					isValid = isValid && !currentBoardArray.get(tileIndex + offset);
 				} else if (i === rookOffset) {
 					isValid =
 						isValid &&
-						Piece.isType(currentBoardArray[tileIndex + offset], PieceType.Rook) &&
-						Piece.sameColor(currentBoardArray[tileIndex + offset], friendlyColor);
+						Piece.isType(currentBoardArray.get(tileIndex + offset), PieceType.Rook) &&
+						Piece.sameColor(currentBoardArray.get(tileIndex + offset), friendlyColor);
 				}
 			}
 
@@ -291,7 +304,7 @@ export const generateCastlingMove = (
 export const generatePawnMove = (
 	tileIndex: number,
 	piece: number,
-	currentBoardArray: number[],
+	currentBoardArray: Map<number, number>,
 	currentEnPassantTarget: number | null
 ): Move[] => {
 	let friendlyColor: Color = piece < 16 ? 'White' : 'Black';
@@ -316,15 +329,15 @@ export const generatePawnMove = (
 
 		for (let step = 1; step <= maxStep; step++) {
 			let targetTile = tileIndex + direction[pieceTarget[i]] * step;
-			let targetPiece = currentBoardArray[targetTile];
+			let targetPiece = currentBoardArray.get(targetTile);
 
 			if (currentEnPassantTarget !== targetTile) {
 				// Break out of the loop if diagonal space isnt opponent piece or the space is empty
-				if ((targetPiece === PieceType.None || Piece.sameColor(targetPiece, friendlyColor)) && i !== 1)
+				if ((!targetPiece || Piece.sameColor(targetPiece, friendlyColor)) && i !== 1)
 					break;
 
-				// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendly
-				if (targetPiece !== PieceType.None && (i === 1 || Piece.sameColor(targetPiece, friendlyColor)))
+				// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendlies
+				if (!!targetPiece && (i === 1 || Piece.sameColor(targetPiece, friendlyColor)))
 					break;
 			}
 
@@ -343,7 +356,7 @@ export const generatePawnMove = (
 export const generateKnightMove = (
 	tileIndex: number,
 	piece: number,
-	currentBoardArray: number[]
+	currentBoardArray: Map<number, number>
 ): Move[] => {
 	// -17: 2 north, 1 west, 0 ,3
 	// -15: 2 north, 1 east, 0, 1
@@ -377,7 +390,7 @@ export const generateKnightMove = (
 		const targetTile = tileIndex + knightMoveOffsets[i];
 		// Ensure the target tile is within bounds
 		if (knightNumberOfTilesToEdge[i][0] >= 2 && knightNumberOfTilesToEdge[i][1] >= 1) {
-			const targetPiece = currentBoardArray[targetTile];
+			const targetPiece = currentBoardArray.get(targetTile);
 			// Knight can jump over pieces, so only check for friendly pieces
 			if (!Piece.sameColor(targetPiece, friendlyColor)) {
 				tempMoveList.push({ start: tileIndex, target: targetTile });
@@ -391,7 +404,7 @@ export const generateKnightMove = (
 export const generateSlidingMove = (
 	tileIndex: number,
 	piece: number,
-	currentBoardArray: number[]
+	currentBoardArray: Map<number, number>
 ): Move[] => {
 	let tempMoveList: Move[] = [];
 
@@ -412,17 +425,17 @@ export const generateSlidingMove = (
 
 			let targetTile = tileIndex + direction[directionIndex] * (j + 1);
 
-			let targetPiece = currentBoardArray[targetTile];
+			let targetPiece = currentBoardArray.get(targetTile);
 
 			// Same color piece
-			if (targetPiece !== PieceType.None && Piece.sameColor(targetPiece, friendlyColor)) {
+			if (!!targetPiece && Piece.sameColor(targetPiece, friendlyColor)) {
 				break;
 			}
 
 			tempMoveList.push({ start: tileIndex, target: targetTile });
 
 			// Different color piece
-			if (targetPiece !== PieceType.None && Piece.sameColor(targetPiece, opponentColor)) {
+			if (!!targetPiece && Piece.sameColor(targetPiece, opponentColor)) {
 				break;
 			}
 		}
@@ -433,7 +446,7 @@ export const generateSlidingMove = (
 
 
 export const executeMove = (
-	currentBoardArray: number[],
+	currentBoardArray: Map<number, number>,
 	move: Move,
 	currentTurn: Color,
 	currentCastlingRights: CastlingRightsType,
@@ -442,14 +455,17 @@ export const executeMove = (
 	currentFullMoveClock: number,
 	pickedPiece?: number
 ): BoardInfo => {
+
+	currentBoardArray = _.cloneDeep(currentBoardArray)
+
 	let { start: startTile, target: targetTile, note } = move;
 
-	let pieceToMove = currentBoardArray[startTile];
+	let pieceToMove = currentBoardArray.get(startTile)!;
 
 	let friendlyColor: Color = pieceToMove & PieceColor.White ? 'White' : 'Black';
 	let opponentColor: Color = pieceToMove & PieceColor.Black ? 'Black' : 'White';
 
-	let targetPiece = currentBoardArray[targetTile];
+	let targetPiece = currentBoardArray.get(targetTile);
 
 	let enPassantPotential = null;
 
@@ -457,7 +473,7 @@ export const executeMove = (
 	let opponentCastlingRightsAddress = friendlyColor === 'White' ? [2, 3] : [0, 1];
 
 	// Add halfMove by one if it isnt a capture, reset to zero if it is a capture
-	currentHalfMoveClock = targetPiece === PieceType.None ? ++currentHalfMoveClock : 0;
+	currentHalfMoveClock = !targetPiece ? ++currentHalfMoveClock : 0;
 
 	// Specialized move check
 
@@ -479,7 +495,7 @@ export const executeMove = (
 		// Google en passant
 		else if (targetTile === currentEnPassantTarget) {
 			let holyHell = friendlyColor === 'White' ? 8 : -8;
-			currentBoardArray[targetTile + holyHell] = PieceType.None;
+			currentBoardArray.delete(targetTile + holyHell)
 		}
 	} 
 	
@@ -492,16 +508,17 @@ export const executeMove = (
 		/*                                  Castling                                  */
 		/* -------------------------------------------------------------------------- */
 		// Check if move is kingside castling
-		if (note?.[friendlyColor] === 'kingSide') {
-			currentBoardArray[startTile + 1] = currentBoardArray[startTile + 3];
-			currentBoardArray[startTile + 3] = PieceType.None;
+		if (note?.[friendlyColor] === 0) {
+			currentBoardArray.set(startTile + 1, currentBoardArray.get(startTile + 3)!);
+			currentBoardArray.delete(startTile + 3);
 
 			currentCastlingRights[castlingRightsAddress[0]] = false;
 		}
 		// Check if move is queenside castling
-		else if (note?.[friendlyColor] === 'queenSide') {
-			currentBoardArray[startTile - 1] = currentBoardArray[startTile - 4];
-			currentBoardArray[startTile - 4] = PieceType.None;
+		else if (note?.[friendlyColor] === 1) {
+			
+			currentBoardArray.set(startTile - 1, currentBoardArray.get(startTile - 4)!);
+			currentBoardArray.delete(startTile - 4);
 
 			currentCastlingRights[castlingRightsAddress[1]] = false;
 		}
@@ -534,8 +551,8 @@ export const executeMove = (
 	}
 
 	// Execute actual Moves
-	currentBoardArray[targetTile] = pieceToMove;
-	currentBoardArray[startTile] = PieceType.None;
+	currentBoardArray.set(targetTile, pieceToMove)
+	currentBoardArray.delete(startTile);
 
 	
 	if(currentTurn === "Black")currentFullMoveClock++

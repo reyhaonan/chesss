@@ -13,7 +13,7 @@
 
   const convertMoveToAlgebraicNotation = (move: moveHistoryType) => {
 
-    move.pieceToMove
+    return JSON.stringify([...move.newBoardArray])
 
     return "A"
   }

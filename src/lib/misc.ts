@@ -1,3 +1,6 @@
+/**
+ * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+ */
 export const startingFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 enum Direction {
@@ -55,11 +58,11 @@ export type Color = 'White' | 'Black';
 export type CastlingRightsType = [boolean, boolean, boolean, boolean];
 
 
-export type BoardHistory = [number[], CastlingRightsType, number | null]
+export type BoardHistory = [Map<number, number>, CastlingRightsType, number | null]
 
 
 export type BoardInfo = {
-	newBoardArray: number[];
+	newBoardArray: Map<number, number>;
 	newTurn: Color;
 	newCastlingRights: CastlingRightsType;
 	newEnPassantTarget: number | null;
@@ -67,7 +70,7 @@ export type BoardInfo = {
 	newFullMoveClock: number;
 };
 
-export type BoardInfoArray = [number[], Color, CastlingRightsType, number | null, number, number]
+export type BoardInfoArray = [Map<number, number>, Color, CastlingRightsType, number | null, number, number]
 
 export type Alphabet = "a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"
 

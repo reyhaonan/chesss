@@ -33,7 +33,7 @@
     <div class="absolute inset-0 bg-red-900/40"></div>
   {/if}
 
-  <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">{debugIndex}</div> -->
+  <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">{debugIndex}</div>
 
   <!-- <div class="absolute flex flex-wrap inset-0 justify-around items-stretch text-xs bg-black/20 z-30">
     {#each numberOfTilesToEdge[debugIndex] as e, i}
@@ -51,7 +51,7 @@
 
   // console.log("te",convertNumberToAlgebraicNotation(1))
 
-  export let pieceNumber:number = 0;
+  export let pieceNumber:number | undefined = 0;
   export let highlightForMoveSuggestion = false
   export let highlightSelectedTile = false
   export let highlightLastMove = false
