@@ -53,9 +53,9 @@
 		</div>
 	</div>
 
-	<!-- <div class="absolute top-full text-neutral-50">
+	<div class="absolute top-full text-neutral-50">
 		<div class="font-bold text-2xl">Game param</div>
-		<li>
+		<!-- <li>
 			Castling rights(KQkq): {JSON.stringify(castlingRights)}
 		</li>
 		<li>
@@ -66,21 +66,21 @@
 		</li>
 		<li>
 			Full Move: {fullMoveClock}
-		</li>
+		</li> -->
 		<li>
+			depth 1: {counter}
 		</li>
-		<button on:click={moveRandomly}>MOVE {turn}</button></div> -->
-	<!-- {/if} -->
+		<button on:click={ay}>MOVE {turn}</button></div>
 </Board>
 
 <svelte:window on:beforeunload={() => reject()}/>
 
-
 <script lang="ts">
 	import Board from "$components/Board.svelte";
 	import Tile from "$components/Tile.svelte";
-	import { convertFENToBoardArray, executeMove, generateMoves, isThreefoldRepetition, Piece } from "$lib/Engine";
-	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType } from "$lib/misc";
+	import { convertFENToBoardArray, executeMove, generateMoves, isThreefoldRepetition } from "$lib/Engine";
+	import { Piece } from "$lib/Piece";
+	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType, type CastlingRightsType } from "$lib/misc";
 	import boardInfo from "$stores/BoardInfo";
 	import moveHistory from "$stores/MoveHistory";
 
@@ -135,12 +135,58 @@
 
 	// $: turn, boardArray, moveList, moveRandomly()
 
-	const moveRandomly = () => {
-		let selectedMove = moveList[Math.floor(Math.random() * moveList.length)]
+	let counter = 0
 
-		console.log("executed", selectedMove.start, selectedMove.target)
-		move(selectedMove)
+	type boarrd = {
+		currentBoardArray: Map<number, number>,
+		currentTurn: Color,
+		currentCastlingRights: CastlingRightsType,
+		currentEnPassantTarget: number | null,
+		currentHalfMoveClock: number,
+		currentFullMoveClock: number,
 	}
+
+	const ay = () => {
+		counter = countTotalMove(2, 0, moveList, {
+			currentBoardArray:boardArray,
+			currentCastlingRights: castlingRights,
+			currentEnPassantTarget: enPassantTarget,
+			currentFullMoveClock: fullMoveClock,
+			currentHalfMoveClock: halfMoveClock,
+			currentTurn: turn,
+		})
+	}
+
+	const countTotalMove = (depth: number, id: number, currentMoveList: Move[], {currentBoardArray, currentTurn, currentCastlingRights, currentEnPassantTarget, currentHalfMoveClock, currentFullMoveClock}:boarrd) => {
+		let localCounter = 0
+		for(const i of currentMoveList){
+			// exe
+			let {newBoardArray, newCastlingRights, newEnPassantTarget, newTurn, newHalfMoveClock, newFullMoveClock,} = executeMove(currentBoardArray, i, currentTurn, currentCastlingRights, currentEnPassantTarget, currentHalfMoveClock, currentFullMoveClock)
+			// gen
+			let newMov = generateMoves(newBoardArray, newTurn, newCastlingRights, newEnPassantTarget, newHalfMoveClock, newFullMoveClock, threatMoveList)
+			// tambah
+			localCounter += newMov.length
+
+			if(depth > 0)localCounter += countTotalMove(depth - 1, id + 1, newMov, {
+				currentBoardArray:newBoardArray,
+				currentCastlingRights: newCastlingRights,
+				currentEnPassantTarget: newEnPassantTarget,
+				currentFullMoveClock: newFullMoveClock,
+				currentHalfMoveClock: newHalfMoveClock,
+				currentTurn: newTurn,
+			})
+		}
+
+		return localCounter
+
+		// console.log("executed", selectedMove.start, selectedMove.target)
+	}
+	// const moveRandomly = () => {
+	// 	let selectedMove = moveList[Math.floor(Math.random() * moveList.length)]
+
+	// 	console.log("executed", selectedMove.start, selectedMove.target)
+	// 	move(selectedMove)
+	// }
 
 	const pickPiece = (pieceNumber: number) => {
 		resolve(pieceNumber);

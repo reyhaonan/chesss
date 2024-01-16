@@ -1,4 +1,3 @@
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
   class="w-full flex items-center justify-center relative"
@@ -46,7 +45,7 @@
 </div>
 
 <script lang="ts">
-	import { Piece, convertAlgebraicNotationToNumber, convertNumberToAlgebraicNotation, numberOfTilesToEdge } from "$lib/Engine";
+	import { Piece } from "$lib/Piece";
 	import type { Color } from "$lib/misc";
 
   // console.log("te",convertNumberToAlgebraicNotation(1))

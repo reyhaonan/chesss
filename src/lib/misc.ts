@@ -107,3 +107,35 @@ export const PieceCharLookup = {
 	5: "R",
 	6: "Q",
 }
+
+
+
+const generateNumberOfTilesToEdge = (): number[][] => {
+	const temp: number[][] = [];
+
+	for (let file = 0; file < 8; file++) {
+		for (let rank = 0; rank < 8; rank++) {
+			let nNorth = file;
+			let nEast = 7 - rank;
+			let nSouth = 7 - file;
+			let nWest = rank;
+
+			let tile = file * 8 + rank;
+
+			temp[tile] = [
+				nNorth,
+				nEast,
+				nSouth,
+				nWest,
+				Math.min(nNorth, nWest),
+				Math.min(nNorth, nEast),
+				Math.min(nSouth, nEast),
+				Math.min(nSouth, nWest)
+			];
+		}
+	}
+
+	return temp;
+};
+
+export const numberOfTilesToEdge = generateNumberOfTilesToEdge();
