@@ -1,12 +1,17 @@
 
-<div class="text-neutral-50 text-6xl">
+<div class="text-neutral-50 text-2xl">
 
+	<li>
+		depth 1: {moveList.length}, expected: 20
+	</li>
 	{#each counter as count, i}
 		<li>
-			depth {i + 1}: {count}</li>
+			depth {i + 2}: {count}, expected: {depthExpectation[i]}
+		</li>
 	{/each}
 
-	<button on:click={performTest} class="p-4 bg-slate-50 rounded-md mt-8 text-slate-900">Perform Test with {DEPTH} depth</button>
+	<input type="number" min="0" max="10" bind:value={DEPTH} class="bg-transparent rounded-md border border=neutral-50 mt-32 p-4">
+	<button disabled={typeof DEPTH !== "number" || DEPTH < 1 || DEPTH > 8} on:click={performTest} class="p-4 bg-slate-50 disabled:bg-slate-600 rounded-md mt-8 text-slate-900">Perform Test with {DEPTH ?? "Invalid"} depth</button>
 
 </div>
 
@@ -14,6 +19,18 @@
 <script lang="ts">
 	import { convertFENToBoardArray, executeMove, generateMoves } from "$lib/Engine";
 	import { type Color, type CastlingRightsType, type Move, startingFEN } from "$lib/misc";
+
+	let DEPTH = 2
+
+	const depthExpectation = [
+		400, 
+		8_092, 
+		197_281, 
+		4_865_609, 
+		119_060_324,
+		3_195_901_860,
+		84_998_978_956,
+	]
 
 	let counter = [0, 0, 0, 0]
 
@@ -26,13 +43,14 @@
 		fullMoveClock 
 	] = convertFENToBoardArray(startingFEN)
 
-	let DEPTH = 3
   
 	let moveList:Move[] = []
 	
 	let threatMoveList: Move[] = []
 
   const performTest = () => {
+		if(typeof DEPTH !== "number" || DEPTH < 1 || DEPTH > 8)return alert("INVALID");
+
     countTotalMove(DEPTH, 0, moveList, {
         currentBoardArray:boardArray,
         currentCastlingRights: castlingRights,
