@@ -455,6 +455,7 @@ export const executeMove = (
 	currentFullMoveClock: number,
 	pickedPiece?: number
 ): BoardInfo => {
+	
 
 	currentBoardArray = _.cloneDeep(currentBoardArray)
 
@@ -462,15 +463,12 @@ export const executeMove = (
 
 	let pieceToMove = currentBoardArray.get(startTile)!;
 
-	let friendlyColor: Color = pieceToMove & PieceColor.White ? 'White' : 'Black';
-	let opponentColor: Color = pieceToMove & PieceColor.Black ? 'Black' : 'White';
-
 	let targetPiece = currentBoardArray.get(targetTile);
 
 	let enPassantPotential = null;
 
-	let castlingRightsAddress = friendlyColor === 'White' ? [0, 1] : [2, 3];
-	let opponentCastlingRightsAddress = friendlyColor === 'White' ? [2, 3] : [0, 1];
+	let castlingRightsAddress = currentTurn === 'White' ? [0, 1] : [2, 3];
+	let opponentCastlingRightsAddress = currentTurn === 'White' ? [2, 3] : [0, 1];
 
 	// Add halfMove by one if it isnt a capture, reset to zero if it is a capture
 	currentHalfMoveClock = !targetPiece ? ++currentHalfMoveClock : 0;
@@ -484,7 +482,7 @@ export const executeMove = (
 	if (Piece.isType(pieceToMove, PieceType.Pawn)) {
 		// Pawn capture reset half move clock
 		currentHalfMoveClock = 0;
-		if (pickedPiece) pieceToMove = pickedPiece;
+		if (note === 'promote') pieceToMove = pickedPiece ?? PieceType.Queen + PieceColor[currentTurn];
 
 		/* -------------------------------------------------------------------------- */
 		/*                                 En Passant                                 */
@@ -494,7 +492,7 @@ export const executeMove = (
 			enPassantPotential = targetTile - (targetTile - startTile) / 2;
 		// Google en passant
 		else if (targetTile === currentEnPassantTarget) {
-			let holyHell = friendlyColor === 'White' ? 8 : -8;
+			let holyHell = currentTurn === 'White' ? 8 : -8;
 			currentBoardArray.delete(targetTile + holyHell)
 		}
 	} 
@@ -508,14 +506,14 @@ export const executeMove = (
 		/*                                  Castling                                  */
 		/* -------------------------------------------------------------------------- */
 		// Check if move is kingside castling
-		if (note?.[friendlyColor] === 0) {
+		if (note?.[currentTurn] === 0) {
 			currentBoardArray.set(startTile + 1, currentBoardArray.get(startTile + 3)!);
 			currentBoardArray.delete(startTile + 3);
 
 			currentCastlingRights[castlingRightsAddress[0]] = false;
 		}
 		// Check if move is queenside castling
-		else if (note?.[friendlyColor] === 1) {
+		else if (note?.[currentTurn] === 1) {
 			
 			currentBoardArray.set(startTile - 1, currentBoardArray.get(startTile - 4)!);
 			currentBoardArray.delete(startTile - 4);

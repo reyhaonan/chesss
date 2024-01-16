@@ -163,18 +163,14 @@
 			topOffset = Piece.getFile(tileNumber) * 80
 			leftOffset = Piece.getRank(tileNumber) * 80;
 
-
 			resolve = res
 			reject = rej
-
-
 		})
 	}
 	
 
 	// Move fn
 	const move = async (move: Move) => {
-
 		
 		let {start: startTile, target: targetTile, note} = move
 
@@ -190,6 +186,7 @@
 
 		if(Piece.getFile(targetTile) === endOfLine && Piece.isType(boardArray.get(startTile)!, PieceType.Pawn)){
 			try{
+				move.note = "promote"
 				pickedPiece = await openPickerOverlay(targetTile)
 			}catch{
 				// Cancel out movement entirely
