@@ -1,19 +1,28 @@
 <div class="col-span-3 bg-slate-800 text-neutral-50 px-8 py-16">
   <div class="moveHistory grid grid-cols-8 bg-slate-700">
+
     {#each $moveHistory as move, i}
       {#if i % 2 === 0}
         <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-600">{(i / 2) + 1}</div>
       {/if}
-      <button class="px-3 py-1 font-semibold col-span-3 last:bg-violet-800/60 text-left">{convertMoveToAlgebraicNotation(move)}</button>
+      <button 
+        on:click={() => $boardLookup.lookup = i}
+        class={`px-3 py-1 font-semibold col-span-3 text-left ${$boardLookup.lookup === i?"bg-violet-800/60":""}`}
+        >
+        {convertMoveToAlgebraicNotation(move)}
+      </button>
     {/each}
   </div>
+  {JSON.stringify($boardLookup)}
 </div>
 
 <script lang="ts">
 	import { convertNumberToAlgebraicNotation } from "$lib/Engine";
 	import { Piece } from "$lib/Piece";
 	import { PieceCharLookup, PieceType, alphabet, fileArray } from "$lib/misc";
+	import boardLookup from "$stores/BoardLookup";
   import moveHistory, { type moveHistoryType } from "$stores/MoveHistory";
+
 
 
   const convertMoveToAlgebraicNotation = (move: moveHistoryType) => {

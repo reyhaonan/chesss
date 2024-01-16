@@ -79,6 +79,7 @@
 	import { Piece } from "$lib/Piece";
 	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType, type CastlingRightsType } from "$lib/misc";
 	import boardInfo from "$stores/BoardInfo";
+	import boardLookup from "$stores/BoardLookup";
 	import moveHistory from "$stores/MoveHistory";
 
 	$boardInfo = convertFENToBoardArray(startingFEN)
@@ -111,7 +112,7 @@
 	// i store only 10 of these for threefold checks
 	let boardArrayHistory: BoardHistory[] = [[boardArray, castlingRights, enPassantTarget]]
 
-	// $: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
+	$: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
 
 
 	
@@ -211,6 +212,8 @@
 				isCheckMate: false
 			}
 		]
+
+		$boardLookup = {current:$boardLookup.current + 1, lookup: $boardLookup.lookup + 1}
 
 		enPassantTarget = newEnPassantTarget;
 
