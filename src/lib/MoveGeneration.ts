@@ -65,8 +65,8 @@ export const generatePawnMove = (
 	let tempMoveList: Move[] = [];
 
 	let isOnStartingLine = Piece.sameColor(piece, 'White')
-		? Piece.getFile(tileIndex) === 6
-		: Piece.getFile(tileIndex) === 1;
+		? Piece.getRank(tileIndex) === 6
+		: Piece.getRank(tileIndex) === 1;
 
 	let limit = isOnStartingLine ? 2 : 1;
 

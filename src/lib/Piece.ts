@@ -29,14 +29,14 @@ export const Piece = {
 	 * @param tileNumber
 	 * @returns 0-7
 	 */
-	getFile: (tileNumber: number) => Math.floor(tileNumber / 8),
+	getRank: (tileNumber: number) => Math.floor(tileNumber / 8),
 
 	/**
 	 * return horizontal index
 	 * @param tileNumber
 	 * @returns 0-7
 	 */
-	getRank: (tileNumber: number) => tileNumber % 8,
+	getFile: (tileNumber: number) => tileNumber % 8,
 
 	getPiece: (piece: number) => {
 		return piece % 8

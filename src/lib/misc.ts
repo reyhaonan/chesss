@@ -99,7 +99,7 @@ export type AlgebraicNotation = `${Alphabet}${Num}`
 export const FENRegex = /^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([bw])\s([KQkq]{1,4})\s(-|[a-h][1-8])\s(\d+\s\d+)$/
 
 
-export const PieceCharLookup = {
+export const PieceCharLookup: {[key: number]: string} = {
 	1 : "K",
 	2: "P",
 	3: "N",

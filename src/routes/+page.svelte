@@ -152,8 +152,8 @@
 	const openPickerOverlay = (tileNumber:number) => {
 		return new Promise<number>((res, rej) => {
 			piecePickerIsOpen = true
-			topOffset = Piece.getFile(tileNumber) * 80
-			leftOffset = Piece.getRank(tileNumber) * 80;
+			topOffset = Piece.getRank(tileNumber) * 80
+			leftOffset = Piece.getFile(tileNumber) * 80;
 
 			resolve = res
 			reject = rej
@@ -175,7 +175,7 @@
 		
 		let pickedPiece:number | undefined;
 
-		if(Piece.getFile(targetTile) === endOfLine && Piece.isType(boardArray.get(startTile)!, PieceType.Pawn)){
+		if(Piece.getRank(targetTile) === endOfLine && Piece.isType(boardArray.get(startTile)!, PieceType.Pawn)){
 			try{
 				move.note = "promote"
 				pickedPiece = await openPickerOverlay(targetTile)
@@ -202,8 +202,10 @@
 				turn,
 				startTile: move.start, 
 				targetTile: move.target,
+				note:move.note,
 				pieceToMove: boardArray.get(startTile)!,
-				pieceTarget: boardArray.get(targetTile)!
+				pieceTarget: boardArray.get(targetTile)!,
+				moveList: [...moveList]
 			}
 		]
 

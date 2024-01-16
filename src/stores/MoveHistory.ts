@@ -1,4 +1,4 @@
-import type { BoardInfo } from '$lib/misc'
+import type { BoardInfo, Move } from '$lib/misc'
 import { writable } from 'svelte/store'
 
 
@@ -7,8 +7,10 @@ export type moveHistoryType = {
   lastMove: number[],
   startTile: number,
   targetTile: number,
+  note?: any,
   pieceToMove: number,
-  pieceTarget: number
+  pieceTarget: number,
+  moveList: Move[],
 } & BoardInfo
 
 const moveHistory = writable<moveHistoryType[]>([])

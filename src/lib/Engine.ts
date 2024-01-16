@@ -103,14 +103,14 @@ export const convertFENToBoardArray = (FEN: string): BoardInfoArray => {
 };
 
 export const convertNumberToAlgebraicNotation = (coord: number): string => {
-	const rank = Piece.getRank(coord);
-  const file = Piece.getFile(coord);
+	const file = Piece.getFile(coord);
+  const rank = Piece.getRank(coord);
 
-	if (rank < 0 || rank > 7 || file < 0 || file > 7) {
+	if (file < 0 || file > 7 || file < 0 || file > 7) {
     throw new Error("Invalid board coordinate: " + coord);
   }
 
-	return `${alphabet[rank]}${(fileArray[file])}`
+	return `${alphabet[file]}${(fileArray[rank])}`
 }
 
 export const convertAlgebraicNotationToNumber = (coord: string):number => {
@@ -272,16 +272,16 @@ export const executeMove = (
 		/* -------------------------------------------------------------------------- */
 		/*                             Castling Invalidate                            */
 		/* -------------------------------------------------------------------------- */
-		if (Piece.getRank(startTile) === 7) currentCastlingRights[currentTurn].kingSide = false;
-		else if (Piece.getRank(startTile) === 0)currentCastlingRights[currentTurn].queenSide = false;
+		if (Piece.getFile(startTile) === 7) currentCastlingRights[currentTurn].kingSide = false;
+		else if (Piece.getFile(startTile) === 0)currentCastlingRights[currentTurn].queenSide = false;
 	}
 
 
 	// Revoke opponent castling rights if we captured a rook
 	if (Piece.isType(targetPiece, PieceType.Rook)) {
-		if (Piece.getRank(targetTile) === 7)
+		if (Piece.getFile(targetTile) === 7)
 			currentCastlingRights[currentTurn === "White"?"Black":"White"].kingSide = false;
-		else if (Piece.getRank(targetTile) === 0)
+		else if (Piece.getFile(targetTile) === 0)
 			currentCastlingRights[currentTurn === "White"?"Black":"White"].queenSide = false;
 	}
 
