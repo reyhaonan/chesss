@@ -25,7 +25,7 @@
       <div class="w-1/3 bg-indigo-800/30 transition-all duration-75 group-hover:w-full group-hover:rounded-none rounded-full aspect-square absolute-center"></div>
     {/if}
   {:else if highlightLastMove}
-    <div class="absolute inset-0 border-2 border-amber-500/20">
+    <div class="absolute inset-0 border-4 border-amber-500/20">
       
     </div>
   {/if}

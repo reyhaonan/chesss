@@ -1,5 +1,5 @@
 <div class="col-span-8 rounded-t-lg bg-slate-900 px-3 py-2">Board History</div>
-<div class="moveHistory grid grid-cols-8 max-h-[50vh]">
+<div class="moveHistory grid grid-cols-8 max-h-[30vh] overflow-auto">
   {#each $moveHistory as move, i}
     {#if i % 2 === 0}
       <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-900">{(i / 2) + 1}</div>
