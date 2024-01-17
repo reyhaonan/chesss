@@ -1,4 +1,4 @@
-<div class="w-full py-2 flex justify-between">
+<div class="w-full p-2 flex justify-between rounded-t-lg bg-slate-900">
   <Button on:click={flip}>
     <span class="material-icons">sync</span>
   </Button>

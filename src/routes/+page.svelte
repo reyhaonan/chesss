@@ -182,7 +182,7 @@
 	
 			console.log("executed", selectedMove.start, selectedMove.target)
 			move(selectedMove)
-		},1000)
+		},100)
 	}
 
 	const pickPiece = (pieceNumber: number) => {

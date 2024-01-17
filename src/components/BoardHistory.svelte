@@ -1,4 +1,4 @@
-<div class="col-span-8 rounded-t-lg bg-slate-900 px-3 py-2">Board History</div>
+
 <div class="moveHistory grid grid-cols-8 max-h-[30vh] overflow-auto">
   {#each $moveHistory as move, i}
     {#if i % 2 === 0}

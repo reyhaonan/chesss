@@ -49,11 +49,8 @@
 </div>
 
 <script lang="ts">
-	import { convertAlgebraicNotationToNumber, convertNumberToAlgebraicNotation } from "$lib/Engine";
 	import { Piece } from "$lib/Piece";
 	import type { Color } from "$lib/misc";
-
-  // console.log("te",convertNumberToAlgebraicNotation(1))
 
   export let pieceNumber:number | undefined = 0;
   export let highlightForMoveSuggestion = false
