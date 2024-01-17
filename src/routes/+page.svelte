@@ -53,9 +53,14 @@
 		</div>
 	</div>
 
-	<div class="absolute top-full text-neutral-50">
+	<!-- <div class="absolute top-full text-neutral-50">
 		<div class="font-bold text-2xl">Game param</div>
-		<!-- <li>
+		{#each boardArrayHistory as aa}
+			<li>
+				{JSON.stringify([...aa, [...aa[0].entries()].sort()])}
+			</li>
+			{/each}
+		<li>
 			Castling rights(KQkq): {JSON.stringify(castlingRights)}
 		</li>
 		<li>
@@ -66,8 +71,8 @@
 		</li>
 		<li>
 			Full Move: {fullMoveClock}
-		</li> -->
-	</div>
+		</li>
+	</div> -->
 </Board>
 
 <svelte:window on:beforeunload={() => reject()}/>
@@ -110,13 +115,12 @@
 	let lastMove:number[] = []
 
 	// i store only 10 of these for threefold checks
-	let boardArrayHistory: BoardHistory[] = [[boardArray, castlingRights, enPassantTarget]]
-
-	$: if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
+	let boardArrayHistory: BoardHistory[] = []
 
 
 	
 	$: boardArray, threatMoveList = generateMoves(boardArray, turn === "White"?"Black":"White",  castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, [])
+	$: boardArray, threeFoldCheck()
 	$: threatMoveList, moveList =  generateMoves(boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList)
 	$: if($moveHistory.length > 0)$moveHistory[$moveHistory.length - 1].threatListToOpponent = threatMoveList
 	
@@ -129,6 +133,15 @@
 		}else{
 			alert("draw")
 		}
+	}
+
+	const threeFoldCheck = () => {
+		console.log("AY")
+		if(boardArrayHistory.length >= 10)boardArrayHistory.shift()
+
+		boardArrayHistory = [...boardArrayHistory, [boardArray, castlingRights, enPassantTarget]]
+
+		if(isThreefoldRepetition(boardArrayHistory))alert("Threefold draw")
 	}
 
 	// $: turn, boardArray, moveList, moveRandomly()
@@ -227,14 +240,8 @@
 
 		castlingRights = newCastlingRights;
 
-		if(boardArrayHistory.length >= 10)boardArrayHistory.shift()
-		boardArrayHistory.push([newBoardArray, newCastlingRights, newEnPassantTarget])
-
-		boardArrayHistory = boardArrayHistory
-
 		boardArray = new Map(newBoardArray);
 	}
-
 
 
 	$: threatMoveList, console.log("threatMoveList", threatMoveList)

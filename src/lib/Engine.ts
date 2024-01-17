@@ -302,11 +302,12 @@ export const executeMove = (
 	};
 };
 
-export const isThreefoldRepetition = (array: BoardHistory[]): boolean => {
+export const isThreefoldRepetition = (boardHistory: BoardHistory[]): boolean => {
 	const seenArrays = new Map<string, number>();
 
-	for (const innerArray of array) {
-		const arrayString = JSON.stringify(innerArray);
+	for (const innerArray of boardHistory) {
+		// console.log("threefold check", JSON.stringify([...innerArray, [...innerArray[0]]]))
+		const arrayString = JSON.stringify([...innerArray, [...innerArray[0].entries()].sort()]);
 
 		const count = seenArrays.get(arrayString) || 0;
 		seenArrays.set(arrayString, count + 1);
