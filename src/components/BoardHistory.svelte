@@ -12,7 +12,6 @@
     </button>
   {/each}
 </div>
-{JSON.stringify($boardLookup)}
 
 
 

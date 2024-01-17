@@ -2,23 +2,23 @@
   <Button on:click={flip}>
     <span class="material-icons">sync</span>
   </Button>
-  <Button on:click={() => boardLookup.firstPage()}>
-    <span class="material-icons">
+  <Button disabled={isFirstPage} on:click={() => boardLookup.firstPage()}>
+    <span class="material-icons" class:text-slate-700={isFirstPage}>
       first_page
     </span>
   </Button>
-  <Button on:click={() => boardLookup.prevPage()}>
-    <span class="material-icons">
+  <Button disabled={isFirstPage} on:click={() => boardLookup.prevPage()}>
+    <span class="material-icons" class:text-slate-700={isFirstPage}>
       navigate_before
     </span>
   </Button>
-  <Button on:click={() => boardLookup.nextPage()}>
-    <span class="material-icons">
+  <Button disabled={isLastPage} on:click={() => boardLookup.nextPage()}>
+    <span class="material-icons" class:text-slate-700={isLastPage}>
       navigate_next
     </span>
   </Button>
-  <Button on:click={() => boardLookup.lastPage()}>
-    <span class="material-icons">
+  <Button disabled={isLastPage} on:click={() => boardLookup.lastPage()}>
+    <span class="material-icons" class:text-slate-700={isLastPage}>
       last_page
     </span>
   </Button>
@@ -34,6 +34,8 @@
   import flipBoard from "$stores/FlipBoard"
   import boardLookup from "$stores/BoardLookup";
 
+  $: isFirstPage = $boardLookup.lookup <= 0
+  $: isLastPage = $boardLookup.lookup === $boardLookup.current
 
   const flip = () => {
     flipBoard.switchValue()
