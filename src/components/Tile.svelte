@@ -31,8 +31,12 @@
   {/if}
   {#if highlightSelectedTile}
     <div class="absolute inset-0 bg-indigo-800/40"></div>
+    {:else if highlightCheck}
+    <div class="absolute inset-0 bg-red-700/40 text-red-700">
+    </div>
   {/if}
 
+  <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">{debugIndex}</div>
   <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">file: {Piece.getFile(debugIndex)} rank:{Piece.getRank(debugIndex)}</div> -->
   <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">
     {convertAlgebraicNotationToNumber(convertNumberToAlgebraicNotation(debugIndex))}, {convertNumberToAlgebraicNotation(debugIndex)}
@@ -56,6 +60,7 @@
   export let highlightForMoveSuggestion = false
   export let highlightSelectedTile = false
   export let highlightLastMove = false
+  export let highlightCheck = false
 
   export let debugIndex:number
 

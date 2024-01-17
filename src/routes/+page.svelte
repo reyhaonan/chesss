@@ -25,7 +25,7 @@
 					on:dragstart={() => selectedTile = index}
 
 					turn={turn}
-
+					highlightCheck={isCheck === index}
 					debugIndex={index}
 				/>
 			{/each}
@@ -55,8 +55,9 @@
 			</div>
 		</div>
 
-		<!-- <div class="absolute top-full text-neutral-50">
-			<div class="font-bold text-2xl">Game param</div>
+		<div class="absolute top-full text-neutral-50">
+			aaa{isCheck}
+			<!-- <div class="font-bold text-2xl">Game param</div>
 			{#each boardArrayHistory as aa}
 				<li>
 					{JSON.stringify([...aa, [...aa[0].entries()].sort()])}
@@ -73,10 +74,10 @@
 			</li>
 			<li>
 				Full Move: {fullMoveClock}
-			</li>
-		</div> -->
+			</li> -->
+		</div>
 	</Board>
-
+	
 	{:else}
 
 	<Board>
@@ -94,7 +95,7 @@
 			{/each}
 		</div>
 	</Board>
-
+	
 {/if}
 
 
@@ -145,10 +146,11 @@
 	// i store only 10 of these for threefold checks
 	let boardArrayHistory: BoardHistory[] = []
 
-
+	let isCheck:number | null = null
 	
 	$: boardArray, threatMoveList = generateMoves(boardArray, turn === "White"?"Black":"White",  castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, [])
 	$: boardArray, threeFoldCheck()
+	$: isCheck = threatMoveList.find(move => Piece.isType(boardArray.get(move.target), PieceType.King))?.target ?? null
 	$: threatMoveList, moveList =  generateMoves(boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock, threatMoveList)
 	$: if($moveHistory.length > 0)$moveHistory[$moveHistory.length - 1].threatListToOpponent = threatMoveList
 	
@@ -278,7 +280,7 @@
 	$: threatMoveList, console.log("threatMoveList", threatMoveList)
 	$: moveList, console.log("moveList", moveList)
 
-	$: if(turn === "Black")moveRandomly()
+	// $: if(turn === "Black")moveRandomly()
 
 
 </script>
