@@ -13,6 +13,7 @@ export type moveHistoryType = {
   moveList: Move[],
   isCheckMate: boolean,
   threatListToOpponent: Move[],
+  pickedPiece?: number
 } & BoardInfo
 
 const moveHistory = writable<moveHistoryType[]>([])

@@ -176,12 +176,14 @@
 
 
 
-	// const moveRandomly = () => {
-	// 	let selectedMove = moveList[Math.floor(Math.random() * moveList.length)]
-
-	// 	console.log("executed", selectedMove.start, selectedMove.target)
-	// 	move(selectedMove)
-	// }
+	const moveRandomly = () => {
+		setTimeout(() => {
+			let selectedMove = moveList[Math.floor(Math.random() * moveList.length)]
+	
+			console.log("executed", selectedMove.start, selectedMove.target)
+			move(selectedMove)
+		},1000)
+	}
 
 	const pickPiece = (pieceNumber: number) => {
 		resolve(pieceNumber);
@@ -250,7 +252,8 @@
 				moveList: [...moveList],
 				// Leaving this to sideeffect
 				threatListToOpponent: [],
-				isCheckMate: false
+				isCheckMate: false,
+				pickedPiece
 			}
 		]
 
@@ -274,6 +277,8 @@
 
 	$: threatMoveList, console.log("threatMoveList", threatMoveList)
 	$: moveList, console.log("moveList", moveList)
+
+	$: if(turn === "Black")moveRandomly()
 
 
 </script>

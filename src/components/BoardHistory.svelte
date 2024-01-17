@@ -33,6 +33,7 @@
     let piece = PieceCharLookup[Piece.getPiece(move.pieceToMove)]
     let targetNotation = convertNumberToAlgebraicNotation(move.targetTile)
 
+    let isPromotion = move.note === "promote"
     let isCapture = false
     if(!!move.pieceTarget || move.note === "enPassant")isCapture = true
 
@@ -42,6 +43,7 @@
       || (Piece.isType(move.pieceToMove, PieceType.Pawn) && isCapture)
 
 
+
     let files:string = "";
 
     if(piece === "P")piece = ""
@@ -49,7 +51,7 @@
 
     let isACheck = move.threatListToOpponent.some(e => Piece.isType(move.newBoardArray.get(e.target), PieceType.King))
 
-    return `${piece}${files}${isCapture ? "x" : "" }${targetNotation}${move.isCheckMate?"#":isACheck?"+":""}`
+    return `${piece}${files}${isCapture ? "x" : "" }${targetNotation}${move.isCheckMate?"#":isACheck?"+":""}${isPromotion && move.pickedPiece?PieceCharLookup[Piece.getPiece(move.pickedPiece)]:""}`
   }
 
 </script>
