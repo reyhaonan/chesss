@@ -5,11 +5,11 @@
   import "$lib/app.css";
 </script>
 
-<!-- <Navbar/> -->
-<div class="grid grid-cols-12 min-h-screen">
+<div class="grid grid-cols-12 h-screen pt-12">
+	<Navbar/>
 	<LeftSidebar/>
 	<main class="col-span-6">
-		<div class="w-full flex items-center justify-center my-8">
+		<div class="w-full my-8">
 			<slot/>
 		</div>
 	</main>
