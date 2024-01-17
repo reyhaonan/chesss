@@ -1,9 +1,9 @@
 
 <!-- Graphical only -->
 
-<!-- thank you chess.com -->
 <div class="h-[80vh] mx-auto aspect-square rounded-md border-slate-900 border-2 relative bg-cover bg-center" 
   style="background-image: url('/board.svg');"
+  use:disableRightClick
   >
   <!-- Indication row -->
   <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-bold">
@@ -30,6 +30,7 @@
 
 
 <script lang="typescript">
+	import { disableRightClick } from "$lib/disableRightClick";
 	import { fileArray, rankArray,  } from "$lib/misc";
   import flipBoard from "$stores/FlipBoard";
 

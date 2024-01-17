@@ -13,7 +13,7 @@
 						() => {
 							let moveToUse = moveList.find(move => move.start === selectedTile && move.target === index)
 							if(!!moveToUse)move(moveToUse)
-							else if(!Piece.isType(boardArray.get(index), PieceType.None))selectedTile = index
+							else if(boardArray.has(index))selectedTile = index
 							else selectedTile = -1
 						}
 					}
@@ -112,6 +112,7 @@
 	import boardLookup from "$stores/BoardLookup";
 	import flipBoard from "$stores/FlipBoard";
 	import moveHistory from "$stores/MoveHistory";
+	import { has } from "lodash";
 
 	$boardInfo = convertFENToBoardArray(startingFEN)
 	// $boardInfo = convertFENToBoardArray("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1")

@@ -6,7 +6,7 @@
     {/if}
     <button 
       on:click={() => $boardLookup.lookup = i}
-      class={`px-3 py-1 font-semibold col-span-3 text-left ${$boardLookup.lookup === i?"bg-violet-800/60":""}`}
+      class={`px-3 py-1 font-semibold col-span-3 text-left ${$boardLookup.lookup === i?"bg-indigo-800/60":""}`}
       >
       {convertMoveToAlgebraicNotation(move)}
     </button>
