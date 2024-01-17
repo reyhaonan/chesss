@@ -36,7 +36,7 @@
     </div>
   {/if}
 
-  <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">{debugIndex}</div>
+  <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">{debugIndex}</div> -->
   <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">file: {Piece.getFile(debugIndex)} rank:{Piece.getRank(debugIndex)}</div> -->
   <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">
     {convertAlgebraicNotationToNumber(convertNumberToAlgebraicNotation(debugIndex))}, {convertNumberToAlgebraicNotation(debugIndex)}
