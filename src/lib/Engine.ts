@@ -1,5 +1,5 @@
 import { generatePawnMove, generateKnightMove, generateCastlingMove, generateSlidingMove } from './MoveGeneration';
-import { direction, alphabet, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, filesLookup, fileArray, type BoardInfoArray, PieceType, PieceColor, } from './misc';
+import { direction, type BoardHistory, type BoardInfo, type CastlingRightsType, type Color, type Move, rankLookup, FENRegex, type BoardInfoArray, PieceType, PieceColor, rankArray, fileLookup, fileArray, } from './misc';
 import { Piece } from "$lib/Piece";
 import _ from 'lodash';
 // export const generateMoves = (piece: ) => {}
@@ -110,20 +110,20 @@ export const convertNumberToAlgebraicNotation = (coord: number): string => {
     throw new Error("Invalid board coordinate: " + coord);
   }
 
-	return `${alphabet[file]}${(fileArray[rank])}`
+	return `${fileArray[file]}${(rankArray[rank])}`
 }
 
 export const convertAlgebraicNotationToNumber = (coord: string):number => {
-	const [rankChar, fileStr] = coord;
+	const [fileChar, rankChar] = coord;
 
   const rank = rankLookup[rankChar.toLowerCase()];
-  const file = filesLookup[fileStr];
+  const file = fileLookup[fileChar];
 
   if (rank === undefined || isNaN(file)) {
     throw new Error("Invalid algebraic notation: " + coord);
   }
 
-  return rank + file * 8;
+  return rank * 8 + file;
 }
 
 export const generateMoves = (

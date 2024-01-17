@@ -1,9 +1,9 @@
-<div class="col-span-3 bg-slate-800 text-neutral-50 px-8 py-16">
-  <div class="moveHistory grid grid-cols-8 bg-slate-700">
-
+<div class="col-span-3 bg-slate-800 text-neutral-50 py-16">
+  <div class="moveHistory grid grid-cols-8">
+    <div class="col-span-8 bg-slate-700 px-3 py-2">Board History</div>
     {#each $moveHistory as move, i}
       {#if i % 2 === 0}
-        <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-600">{(i / 2) + 1}</div>
+        <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-700">{(i / 2) + 1}</div>
       {/if}
       <button 
         on:click={() => $boardLookup.lookup = i}
@@ -19,7 +19,7 @@
 <script lang="ts">
 	import { convertNumberToAlgebraicNotation } from "$lib/Engine";
 	import { Piece } from "$lib/Piece";
-	import { PieceCharLookup, PieceType, alphabet, fileArray } from "$lib/misc";
+	import { PieceCharLookup, PieceType, fileArray } from "$lib/misc";
 	import boardLookup from "$stores/BoardLookup";
   import moveHistory, { type moveHistoryType } from "$stores/MoveHistory";
 
@@ -45,7 +45,7 @@
     let files:string = "";
 
     if(piece === "P")piece = ""
-    if(shouldSpecifyFiles)files = alphabet[Piece.getFile(move.startTile)]
+    if(shouldSpecifyFiles)files = fileArray[Piece.getFile(move.startTile)]
 
     let isACheck = move.threatListToOpponent.some(e => Piece.isType(move.newBoardArray.get(e.target), PieceType.King))
 

@@ -34,6 +34,9 @@
   {/if}
 
   <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">file: {Piece.getFile(debugIndex)} rank:{Piece.getRank(debugIndex)}</div> -->
+  <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">
+    {convertAlgebraicNotationToNumber(convertNumberToAlgebraicNotation(debugIndex))}, {convertNumberToAlgebraicNotation(debugIndex)}
+  </div> -->
 
   <!-- <div class="absolute flex flex-wrap inset-0 justify-around items-stretch text-xs bg-black/20 z-30">
     {#each numberOfTilesToEdge[debugIndex] as e, i}
@@ -46,6 +49,7 @@
 </div>
 
 <script lang="ts">
+	import { convertAlgebraicNotationToNumber, convertNumberToAlgebraicNotation } from "$lib/Engine";
 	import { Piece } from "$lib/Piece";
 	import type { Color } from "$lib/misc";
 

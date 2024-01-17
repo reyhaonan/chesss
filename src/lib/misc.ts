@@ -81,13 +81,13 @@ export type BoardInfoArray = [Map<number, number>, Color, CastlingRightsType, nu
 
 export type Alphabet = "a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"
 
-export const alphabet: string[] = ["a","b","c","d","e","f","g","h"]
+export const fileArray: string[] = ["a","b","c","d","e","f","g","h"]
 
-export const rankLookup:{[key:string]:number} = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
+export const fileLookup:{[key:string]:number} = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
 
-export const filesLookup:{[key:string | number]:number} = { 8: 0, 7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7 };
+export const rankLookup:{[key:string | number]:number} = { 8: 0, 7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7 };
 
-export const fileArray = [8, 7, 6, 5, 4, 3, 2, 1]
+export const rankArray = [8, 7, 6, 5, 4, 3, 2, 1]
 
 
 export type Num = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
@@ -137,3 +137,13 @@ const generateNumberOfTilesToEdge = (): number[][] => {
 };
 
 export const numberOfTilesToEdge = generateNumberOfTilesToEdge();
+
+const generateIterableBoard = () => {
+	let temp: number[] = []
+	for(let i = 0; i < 64; i++){
+		temp.push(i)
+	}
+	return temp
+}
+
+export const boardIterable = generateIterableBoard()

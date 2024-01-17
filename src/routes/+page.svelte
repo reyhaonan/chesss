@@ -1,30 +1,30 @@
 
-<Board>
+<Board flip={flip}>
 	<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
-		{#each [...Array(64)] as el, i}
+		{#each boardToUse as index}
 			<Tile 
-				pieceNumber={boardArray.get(i)} 
-				highlightLastMove={lastMove.some(e => e === i)}
-				highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === i)}
-				highlightSelectedTile={selectedTile === i}
+				pieceNumber={boardArray.get(index)} 
+				highlightLastMove={lastMove.some(e => e === index)}
+				highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === index)}
+				highlightSelectedTile={selectedTile === index}
 				on:click={
 					() => {
-						let moveToUse = moveList.find(move => move.start === selectedTile && move.target === i)
+						let moveToUse = moveList.find(move => move.start === selectedTile && move.target === index)
 						if(!!moveToUse)move(moveToUse)
-						else if(!Piece.isType(boardArray.get(i), PieceType.None))selectedTile = i
+						else if(!Piece.isType(boardArray.get(index), PieceType.None))selectedTile = index
 						else selectedTile = -1
 					}
 				}
 				on:drop={() => {
-					let moveToUse = moveList.find(move => move.start === selectedTile && move.target === i)
+					let moveToUse = moveList.find(move => move.start === selectedTile && move.target === index)
 					if(!!moveToUse)move(moveToUse)
 				}}
 				on:dragend={() => selectedTile = -1}
-				on:dragstart={() => selectedTile = i}
+				on:dragstart={() => selectedTile = index}
 
 				turn={turn}
 
-				debugIndex={i}
+				debugIndex={index}
 			/>
 		{/each}
 
@@ -75,6 +75,8 @@
 	</div> -->
 </Board>
 
+<button on:click={() => flip = !flip}>Flip Board</button>
+
 <svelte:window on:beforeunload={() => reject()}/>
 
 <script lang="ts">
@@ -82,7 +84,7 @@
 	import Tile from "$components/Tile.svelte";
 	import { convertFENToBoardArray, executeMove, generateMoves, isThreefoldRepetition } from "$lib/Engine";
 	import { Piece } from "$lib/Piece";
-	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType, type CastlingRightsType } from "$lib/misc";
+	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType, type CastlingRightsType, boardIterable } from "$lib/misc";
 	import boardInfo from "$stores/BoardInfo";
 	import boardLookup from "$stores/BoardLookup";
 	import moveHistory from "$stores/MoveHistory";
@@ -104,7 +106,9 @@
 	let moveList:Move[] = []
 	
 	let threatMoveList: Move[] = []
+	let flip = false;
 
+	$: boardToUse = flip ? boardIterable.reverse(): boardIterable
 
 	let selectedTile:number = -1;
 
