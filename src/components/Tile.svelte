@@ -25,7 +25,7 @@
       <div class="w-1/3 bg-indigo-800/30 rounded-full aspect-square absolute-center"></div>
     {/if}
   {:else if highlightLastMove}
-    <div class="absolute inset-0 bg-amber-500/20">
+    <div class="absolute inset-0 bg-amber-500/10">
       
     </div>
   {/if}

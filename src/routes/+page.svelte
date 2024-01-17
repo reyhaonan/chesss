@@ -1,80 +1,101 @@
 
 <ProfileSection/>
-<Board>
-	<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
-		{#each boardToUse as index}
-			<Tile 
-				pieceNumber={boardArray.get(index)} 
-				highlightLastMove={lastMove.some(e => e === index)}
-				highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === index)}
-				highlightSelectedTile={selectedTile === index}
-				on:click={
-					() => {
+{#if $boardLookup.current === $boardLookup.lookup}
+	<Board>
+		<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
+			{#each boardToUse as index}
+				<Tile 
+					pieceNumber={boardArray.get(index)} 
+					highlightLastMove={lastMove.some(e => e === index)}
+					highlightForMoveSuggestion={!!moveList.find(move => move.start === selectedTile && move.target === index)}
+					highlightSelectedTile={selectedTile === index}
+					on:click={
+						() => {
+							let moveToUse = moveList.find(move => move.start === selectedTile && move.target === index)
+							if(!!moveToUse)move(moveToUse)
+							else if(!Piece.isType(boardArray.get(index), PieceType.None))selectedTile = index
+							else selectedTile = -1
+						}
+					}
+					on:drop={() => {
 						let moveToUse = moveList.find(move => move.start === selectedTile && move.target === index)
 						if(!!moveToUse)move(moveToUse)
-						else if(!Piece.isType(boardArray.get(index), PieceType.None))selectedTile = index
-						else selectedTile = -1
-					}
-				}
-				on:drop={() => {
-					let moveToUse = moveList.find(move => move.start === selectedTile && move.target === index)
-					if(!!moveToUse)move(moveToUse)
-				}}
-				on:dragend={() => selectedTile = -1}
-				on:dragstart={() => selectedTile = index}
+					}}
+					on:dragend={() => selectedTile = -1}
+					on:dragstart={() => selectedTile = index}
 
-				turn={turn}
+					turn={turn}
 
-				debugIndex={index}
-			/>
-		{/each}
-
-	</div>
-
-	<!-- {#if } -->
-	<div class="absolute top-0 left-0 bg-slate-800/60 inset-0 z-30" class:hidden={!piecePickerIsOpen} slot="picker">
-		<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-20 h-80" style="top:{topOffset}px;left:{leftOffset}px">
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-
-			<button on:click={() => pickPiece(PieceType.Queen + PieceColor[turn])}>
-				<img src={`/pawn_default/${PieceType.Queen + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-			</button>
-
-			<button on:click={() => pickPiece(PieceType.Knight + PieceColor[turn])}>
-				<img src={`/pawn_default/${PieceType.Knight + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-			</button>
-
-			<button on:click={() => pickPiece(PieceType.Rook + PieceColor[turn])}>
-				<img src={`/pawn_default/${PieceType.Rook + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-			</button>
-
-			<button on:click={() => pickPiece(PieceType.Bishop + PieceColor[turn])}>
-				<img src={`/pawn_default/${PieceType.Bishop + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
-			</button>
-		</div>
-	</div>
-
-	<!-- <div class="absolute top-full text-neutral-50">
-		<div class="font-bold text-2xl">Game param</div>
-		{#each boardArrayHistory as aa}
-			<li>
-				{JSON.stringify([...aa, [...aa[0].entries()].sort()])}
-			</li>
+					debugIndex={index}
+				/>
 			{/each}
-		<li>
-			Castling rights(KQkq): {JSON.stringify(castlingRights)}
-		</li>
-		<li>
-			En Passant Target: {enPassantTarget}
-		</li>
-		<li>
-			Half Move: {halfMoveClock}
-		</li>
-		<li>
-			Full Move: {fullMoveClock}
-		</li>
-	</div> -->
-</Board>
+
+		</div>
+
+		<!-- {#if } -->
+		<div class="absolute top-0 left-0 bg-slate-800/60 inset-0 z-30" class:hidden={!piecePickerIsOpen} slot="picker">
+			<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-20 h-80" style="top:{topOffset}px;left:{leftOffset}px">
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+
+				<button on:click={() => pickPiece(PieceType.Queen + PieceColor[turn])}>
+					<img src={`/pawn_default/${PieceType.Queen + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				</button>
+
+				<button on:click={() => pickPiece(PieceType.Knight + PieceColor[turn])}>
+					<img src={`/pawn_default/${PieceType.Knight + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				</button>
+
+				<button on:click={() => pickPiece(PieceType.Rook + PieceColor[turn])}>
+					<img src={`/pawn_default/${PieceType.Rook + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				</button>
+
+				<button on:click={() => pickPiece(PieceType.Bishop + PieceColor[turn])}>
+					<img src={`/pawn_default/${PieceType.Bishop + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				</button>
+			</div>
+		</div>
+
+		<!-- <div class="absolute top-full text-neutral-50">
+			<div class="font-bold text-2xl">Game param</div>
+			{#each boardArrayHistory as aa}
+				<li>
+					{JSON.stringify([...aa, [...aa[0].entries()].sort()])}
+				</li>
+				{/each}
+			<li>
+				Castling rights(KQkq): {JSON.stringify(castlingRights)}
+			</li>
+			<li>
+				En Passant Target: {enPassantTarget}
+			</li>
+			<li>
+				Half Move: {halfMoveClock}
+			</li>
+			<li>
+				Full Move: {fullMoveClock}
+			</li>
+		</div> -->
+	</Board>
+
+	{:else}
+
+	<Board>
+		<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
+			{#each boardToUse as index}
+					<Tile 
+						pieceNumber={$moveHistory[$boardLookup.lookup].newBoardArray.get(index)} 
+						highlightLastMove={$moveHistory[$boardLookup.lookup].lastMove.some(e => e === index)}
+						highlightForMoveSuggestion={false}
+						highlightSelectedTile={false}
+						turn={$moveHistory[$boardLookup.lookup].turn}
+
+						debugIndex={index}
+					/>
+			{/each}
+		</div>
+	</Board>
+
+{/if}
 
 
 <svelte:window on:beforeunload={() => reject()}/>
