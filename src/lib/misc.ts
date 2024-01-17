@@ -147,3 +147,4 @@ const generateIterableBoard = () => {
 }
 
 export const boardIterable = generateIterableBoard()
+export const reversedBoardIterable = generateIterableBoard().reverse()

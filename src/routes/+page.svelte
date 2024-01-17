@@ -1,5 +1,6 @@
 
-<Board flip={flip}>
+<ProfileSection/>
+<Board>
 	<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
 		{#each boardToUse as index}
 			<Tile 
@@ -75,18 +76,20 @@
 	</div> -->
 </Board>
 
-<button on:click={() => flip = !flip}>Flip Board</button>
 
 <svelte:window on:beforeunload={() => reject()}/>
 
 <script lang="ts">
 	import Board from "$components/Board.svelte";
+	import ControlBar from "$components/ControlBar.svelte";
+	import ProfileSection from "$components/ProfileSection.svelte";
 	import Tile from "$components/Tile.svelte";
 	import { convertFENToBoardArray, executeMove, generateMoves, isThreefoldRepetition } from "$lib/Engine";
 	import { Piece } from "$lib/Piece";
-	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType, type CastlingRightsType, boardIterable } from "$lib/misc";
+	import { startingFEN, type Move, type Color, type BoardHistory, PieceColor, PieceType, type CastlingRightsType, boardIterable, reversedBoardIterable } from "$lib/misc";
 	import boardInfo from "$stores/BoardInfo";
 	import boardLookup from "$stores/BoardLookup";
+	import flipBoard from "$stores/FlipBoard";
 	import moveHistory from "$stores/MoveHistory";
 
 	$boardInfo = convertFENToBoardArray(startingFEN)
@@ -106,9 +109,8 @@
 	let moveList:Move[] = []
 	
 	let threatMoveList: Move[] = []
-	let flip = false;
 
-	$: boardToUse = flip ? boardIterable.reverse(): boardIterable
+	$: boardToUse = $flipBoard ? reversedBoardIterable : boardIterable
 
 	let selectedTile:number = -1;
 

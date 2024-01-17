@@ -31,9 +31,12 @@
 
 <script lang="typescript">
 	import { fileArray, rankArray,  } from "$lib/misc";
+  import flipBoard from "$stores/FlipBoard";
 
-  $: rankToUse = flip? rankArray.reverse() : rankArray
-  $: fileToUse = flip? fileArray.reverse(): fileArray
+  const reversedRank = [...rankArray].reverse()
+  const reversedFile = [...fileArray].reverse()
 
-  export let flip = false
+  $: rankToUse = $flipBoard ? reversedRank : rankArray
+  $: fileToUse = $flipBoard ? reversedFile : fileArray
+
 </script>

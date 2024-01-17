@@ -5,7 +5,7 @@
   import "$lib/app.css";
 </script>
 
-<div class="grid grid-cols-12 h-screen pt-12">
+<div class="grid grid-cols-12 h-screen pt-12 overflow-hidden">
 	<Navbar/>
 	<LeftSidebar/>
 	<main class="col-span-6">
