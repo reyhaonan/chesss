@@ -20,17 +20,17 @@
 
   {#if highlightForMoveSuggestion}
     {#if !!pieceNumber}
-      <div class="w-11/12 border-red-900/30 border-[6px] rounded-full aspect-square absolute-center"></div>
+      <div class="w-11/12 border-indigo-800/30 border-[6px] rounded-full aspect-square absolute-center"></div>
     {:else}
-      <div class="w-1/3 bg-red-900/30 rounded-full aspect-square absolute-center"></div>
+      <div class="w-1/3 bg-indigo-800/30 rounded-full aspect-square absolute-center"></div>
     {/if}
   {:else if highlightLastMove}
-    <div class="absolute inset-0 bg-amber-500/40">
+    <div class="absolute inset-0 bg-amber-500/20">
       
     </div>
   {/if}
   {#if highlightSelectedTile}
-    <div class="absolute inset-0 bg-red-900/40"></div>
+    <div class="absolute inset-0 bg-indigo-800/40"></div>
   {/if}
 
   <!-- <div class="absolute text-left text-red-500 z-50 right-0 top-0 text-xs">file: {Piece.getFile(debugIndex)} rank:{Piece.getRank(debugIndex)}</div> -->

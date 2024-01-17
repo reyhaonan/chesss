@@ -2,7 +2,6 @@
   <Button on:click={flip}>
     <span class="material-icons">sync</span>
   </Button>
-  {$flipBoard}
 </div>
 
 <script lang="ts">

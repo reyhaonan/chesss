@@ -2,18 +2,18 @@
 <!-- Graphical only -->
 
 <!-- thank you chess.com -->
-<div class="h-[80vh] mx-auto aspect-square rounded-md relative bg-cover bg-center" 
-  style="background-image: url('https://images.chesscomfiles.com/chess-themes/boards/green/200.png');"
+<div class="h-[80vh] mx-auto aspect-square rounded-md border-slate-900 border-2 relative bg-cover bg-center" 
+  style="background-image: url('/board.svg');"
   >
   <!-- Indication row -->
   <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-bold">
     {#each rankToUse as num, i}
-      <div class={`pl-1 ${i % 2 !== 0? "text-[#e9edcc]":"text-[#789954]"}`}>{num}</div>
+      <div class={`pl-1 ${i % 2 !== 0? "text-slate-950":"text-slate-900"}`}>{num}</div>
     {/each}
   </div>
   <div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 text-slate-900 font-bold">
     {#each fileToUse as alp, i}
-      <div class={`pb-1 text-right pr-2 ${i % 2 === 0? "text-[#e9edcc]":"text-[#789954]"}`}>{alp}</div>
+      <div class={`pb-1 text-right pr-2 ${i % 2 === 0? "text-slate-950":"text-slate-900"}`}>{alp}</div>
     {/each}
   </div>
   <!-- {#each board as file, i}

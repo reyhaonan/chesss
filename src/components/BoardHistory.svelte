@@ -1,8 +1,8 @@
-<div class="moveHistory grid grid-cols-8">
-  <div class="col-span-8 bg-slate-700 px-3 py-2">Board History</div>
+<div class="col-span-8 rounded-t-lg bg-slate-900 px-3 py-2">Board History</div>
+<div class="moveHistory grid grid-cols-8 max-h-[50vh]">
   {#each $moveHistory as move, i}
     {#if i % 2 === 0}
-      <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-700">{(i / 2) + 1}</div>
+      <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-900">{(i / 2) + 1}</div>
     {/if}
     <button 
       on:click={() => $boardLookup.lookup = i}

@@ -9,4 +9,5 @@ const store = () => {
 }
 
 const flipBoard = store()
+
 export default flipBoard

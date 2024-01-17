@@ -1,4 +1,4 @@
-import type { BoardInfo, Move } from '$lib/misc'
+import type { BoardInfo, Color, Move } from '$lib/misc'
 import { writable } from 'svelte/store'
 
 
