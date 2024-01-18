@@ -1,16 +1,18 @@
 
-<div class="moveHistory grid grid-cols-8 max-h-[30vh] overflow-auto">
-  {#each $moveHistory as move, i}
-    {#if i % 2 === 0}
-      <div class="px-3 py-1 font-semibold text-center col-span-2 bg-slate-900">{(i / 2) + 1}</div>
-    {/if}
-    <button 
-      on:click={() => $boardLookup.lookup = i}
-      class={`px-3 py-1 font-semibold col-span-3 text-left ${$boardLookup.lookup === i?"bg-indigo-800/60":""}`}
-      >
-      {convertMoveToAlgebraicNotation(move)}
-    </button>
-  {/each}
+<div class="moveHistory border-primary/30 rounded-b-lg border-2 h-[40vh] overflow-auto">
+  <div class="grid grid-cols-8">
+    {#each $moveHistory as move, i}
+      {#if i % 2 === 0}
+        <div class="px-3 py-1 font-semibold text-center col-span-2 bg-primary/20 h-max">{(i / 2) + 1}</div>
+      {/if}
+      <button 
+        on:click={() => $boardLookup.lookup = i}
+        class={`px-3 py-1 font-semibold h-max col-span-3 text-left ${$boardLookup.lookup === i?"bg-secondary/60":""}`}
+        >
+        {convertMoveToAlgebraicNotation(move)}
+      </button>
+    {/each}
+  </div>
 </div>
 
 

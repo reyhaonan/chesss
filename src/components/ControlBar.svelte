@@ -1,24 +1,24 @@
-<div class="w-full p-2 flex justify-between rounded-t-lg bg-slate-900">
+<div class="w-full p-1 flex justify-between rounded-t-lg bg-primary/30">
   <Button on:click={flip}>
     <span class="material-icons">sync</span>
   </Button>
   <Button disabled={isFirstPage} on:click={() => boardLookup.firstPage()}>
-    <span class="material-icons" class:text-slate-700={isFirstPage}>
+    <span class="material-icons" class:text-background={isFirstPage}>
       first_page
     </span>
   </Button>
   <Button disabled={isFirstPage} on:click={() => boardLookup.prevPage()}>
-    <span class="material-icons" class:text-slate-700={isFirstPage}>
+    <span class="material-icons" class:text-background={isFirstPage}>
       navigate_before
     </span>
   </Button>
   <Button disabled={isLastPage} on:click={() => boardLookup.nextPage()}>
-    <span class="material-icons" class:text-slate-700={isLastPage}>
+    <span class="material-icons" class:text-background={isLastPage}>
       navigate_next
     </span>
   </Button>
   <Button disabled={isLastPage} on:click={() => boardLookup.lastPage()}>
-    <span class="material-icons" class:text-slate-700={isLastPage}>
+    <span class="material-icons" class:text-background={isLastPage}>
       last_page
     </span>
   </Button>

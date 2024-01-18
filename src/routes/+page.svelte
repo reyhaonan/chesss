@@ -34,29 +34,28 @@
 
 		<!-- {#if } -->
 		<div class="absolute top-0 left-0 bg-slate-800/60 inset-0 z-30" class:hidden={!piecePickerIsOpen} slot="picker">
-			<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-20 h-80" style="top:{topOffset}px;left:{leftOffset}px">
+			<div  class="piecePicker bg-slate-300 flex flex-col items-center justify-between absolute w-[10vh] h-[40vh]" style="top:calc({topOffset} * 10vh);left:calc({leftOffset} * 10vh)">
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 
-				<button on:click={() => pickPiece(PieceType.Queen + PieceColor[turn])}>
-					<img src={`/pawn_default/${PieceType.Queen + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				<button on:click={() => pickPiece(PieceType.Queen + PieceColor[turn])} class="w-4/5">
+					<img src={`/pawn_default/${PieceType.Queen + PieceColor[turn]}.svg`}  class="select-none w-full z-20 cursor-pointer" alt=""/>
 				</button>
 
-				<button on:click={() => pickPiece(PieceType.Knight + PieceColor[turn])}>
-					<img src={`/pawn_default/${PieceType.Knight + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				<button on:click={() => pickPiece(PieceType.Knight + PieceColor[turn])} class="w-4/5">
+					<img src={`/pawn_default/${PieceType.Knight + PieceColor[turn]}.svg`}  class="select-none w-full z-20 cursor-pointer" alt=""/>
 				</button>
 
-				<button on:click={() => pickPiece(PieceType.Rook + PieceColor[turn])}>
-					<img src={`/pawn_default/${PieceType.Rook + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				<button on:click={() => pickPiece(PieceType.Rook + PieceColor[turn])} class="w-4/5">
+					<img src={`/pawn_default/${PieceType.Rook + PieceColor[turn]}.svg`}  class="select-none w-full z-20 cursor-pointer" alt=""/>
 				</button>
 
-				<button on:click={() => pickPiece(PieceType.Bishop + PieceColor[turn])}>
-					<img src={`/pawn_default/${PieceType.Bishop + PieceColor[turn]}.svg`}  class="select-none w-16 z-20 cursor-pointer" alt=""/>
+				<button on:click={() => pickPiece(PieceType.Bishop + PieceColor[turn])} class="w-4/5">
+					<img src={`/pawn_default/${PieceType.Bishop + PieceColor[turn]}.svg`}  class="select-none w-full z-20 cursor-pointer" alt=""/>
 				</button>
 			</div>
 		</div>
 
 		<div class="absolute top-full text-neutral-50">
-			aaa{isCheck}
 			<!-- <div class="font-bold text-2xl">Game param</div>
 			{#each boardArrayHistory as aa}
 				<li>
@@ -198,8 +197,8 @@
 	const openPickerOverlay = (tileNumber:number) => {
 		return new Promise<number>((res, rej) => {
 			piecePickerIsOpen = true
-			topOffset = Piece.getRank(tileNumber) * 80
-			leftOffset = Piece.getFile(tileNumber) * 80;
+			topOffset = Piece.getRank(tileNumber)
+			leftOffset = Piece.getFile(tileNumber);
 
 			resolve = res
 			reject = rej

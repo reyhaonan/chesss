@@ -1,19 +1,19 @@
 
 <!-- Graphical only -->
 
-<div class="h-[80vh] mx-auto aspect-square rounded-md border-slate-900 border-2 relative bg-cover bg-center" 
+<div class="h-[80vh] mx-auto aspect-square rounded-md relative bg-cover bg-center" 
   style="background-image: url('/board.svg');"
   use:disableRightClick
   >
   <!-- Indication row -->
-  <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 text-slate-900 font-bold">
+  <div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 font-bold">
     {#each rankToUse as num, i}
-      <div class={`pl-1 ${i % 2 !== 0? "text-slate-950":"text-slate-900"}`}>{num}</div>
+      <div class={`pl-1 text-background`}>{num}</div>
     {/each}
   </div>
-  <div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 text-slate-900 font-bold">
+  <div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 font-bold">
     {#each fileToUse as alp, i}
-      <div class={`pb-1 text-right pr-2 ${i % 2 === 0? "text-slate-950":"text-slate-900"}`}>{alp}</div>
+      <div class={`pb-1 text-right pr-2 text-background`}>{alp}</div>
     {/each}
   </div>
   <!-- {#each board as file, i}

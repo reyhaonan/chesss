@@ -2,8 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+  @apply text-textColor
+}
+
 body{
-  @apply bg-slate-950
+  color:#9ed6b2ca;
+  @apply bg-background
 }
 
 .absolute-center{
