@@ -1,6 +1,6 @@
 export function disableRightClick(node: HTMLElement) {
 	const handleClick = (event: MouseEvent) => {
-		event.preventDefault()
+		event.preventDefault();
 	};
 
 	node.addEventListener('contextmenu', handleClick, true);

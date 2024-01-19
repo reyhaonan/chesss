@@ -1,5 +1,5 @@
-<slot/>
-
 <script>
-  import "$lib/app.css";
+	import '$lib/app.css';
 </script>
+
+<slot />

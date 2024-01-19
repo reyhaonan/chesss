@@ -1,6 +1,6 @@
-import type { BoardInfoArray } from '$lib/misc'
-import { writable } from 'svelte/store'
+import type { BoardInfoArray } from '$lib/misc';
+import { writable } from 'svelte/store';
 
-const boardInfo = writable<BoardInfoArray>()
+const boardInfo = writable<BoardInfoArray>();
 
-export default boardInfo
+export default boardInfo;

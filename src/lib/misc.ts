@@ -34,20 +34,19 @@ export type Move = {
 	note?: any;
 };
 
-
 export enum PieceType {
-  None,
-  King,
-  Pawn,
-  Knight,
-  Bishop,
-  Rook,
-  Queen,
+	None,
+	King,
+	Pawn,
+	Knight,
+	Bishop,
+	Rook,
+	Queen
 }
 
 export enum PieceColor {
-  White = 8,
-  Black = 16,
+	White = 8,
+	Black = 16
 }
 
 export type Color = 'White' | 'Black';
@@ -57,16 +56,14 @@ export type CastlingRightsType = {
 	White: {
 		kingSide: boolean;
 		queenSide: boolean;
-	},
+	};
 	Black: {
 		kingSide: boolean;
 		queenSide: boolean;
-	}
-}
+	};
+};
 
-
-export type BoardHistory = [Map<number, number>, CastlingRightsType, number | null]
-
+export type BoardHistory = [Map<number, number>, CastlingRightsType, number | null];
 
 export type BoardInfo = {
 	newBoardArray: Map<number, number>;
@@ -77,36 +74,58 @@ export type BoardInfo = {
 	newFullMoveClock: number;
 };
 
-export type BoardInfoArray = [Map<number, number>, Color, CastlingRightsType, number | null, number, number]
+export type BoardInfoArray = [
+	Map<number, number>,
+	Color,
+	CastlingRightsType,
+	number | null,
+	number,
+	number
+];
 
-export type Alphabet = "a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"
+export type Alphabet = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 
-export const fileArray: string[] = ["a","b","c","d","e","f","g","h"]
+export const fileArray: string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
-export const fileLookup:{[key:string]:number} = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
+export const fileLookup: { [key: string]: number } = {
+	a: 0,
+	b: 1,
+	c: 2,
+	d: 3,
+	e: 4,
+	f: 5,
+	g: 6,
+	h: 7
+};
 
-export const rankLookup:{[key:string | number]:number} = { 8: 0, 7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7 };
+export const rankLookup: { [key: string | number]: number } = {
+	8: 0,
+	7: 1,
+	6: 2,
+	5: 3,
+	4: 4,
+	3: 5,
+	2: 6,
+	1: 7
+};
 
-export const rankArray = [8, 7, 6, 5, 4, 3, 2, 1]
+export const rankArray = [8, 7, 6, 5, 4, 3, 2, 1];
 
+export type Num = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-export type Num = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+export type AlgebraicNotation = `${Alphabet}${Num}`;
 
-export type AlgebraicNotation = `${Alphabet}${Num}`
+export const FENRegex =
+	/^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([bw])\s([KQkq]{1,4})\s(-|[a-h][1-8])\s(\d+\s\d+)$/;
 
-export const FENRegex = /^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([bw])\s([KQkq]{1,4})\s(-|[a-h][1-8])\s(\d+\s\d+)$/
-
-
-export const PieceCharLookup: {[key: number]: string} = {
-	1: "K",
-	2: "P",
-	3: "N",
-	4: "B",
-	5: "R",
-	6: "Q",
-}
-
-
+export const PieceCharLookup: { [key: number]: string } = {
+	1: 'K',
+	2: 'P',
+	3: 'N',
+	4: 'B',
+	5: 'R',
+	6: 'Q'
+};
 
 const generateNumberOfTilesToEdge = (): number[][] => {
 	const temp: number[][] = [];
@@ -139,12 +158,12 @@ const generateNumberOfTilesToEdge = (): number[][] => {
 export const numberOfTilesToEdge = generateNumberOfTilesToEdge();
 
 const generateIterableBoard = () => {
-	let temp: number[] = []
-	for(let i = 0; i < 64; i++){
-		temp.push(i)
+	let temp: number[] = [];
+	for (let i = 0; i < 64; i++) {
+		temp.push(i);
 	}
-	return temp
-}
+	return temp;
+};
 
-export const boardIterable = generateIterableBoard()
-export const reversedBoardIterable = generateIterableBoard().reverse()
+export const boardIterable = generateIterableBoard();
+export const reversedBoardIterable = generateIterableBoard().reverse();

@@ -24,11 +24,10 @@ const config = {
 			// // the contents of a directory, not the directory itself
 			// 'my-directory/*': 'path/to/my-directory/*'
 
-			'$components':'./src/components/*',
-			'$stores':'./src/stores/*'
+			$components: './src/components/*',
+			$stores: './src/stores/*'
 		}
 	},
-	preprocess: vitePreprocess()
 };
 
 export default config;

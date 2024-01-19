@@ -1,4 +1,4 @@
-import { PieceColor, type Color } from "./misc";
+import { PieceColor, type Color } from './misc';
 
 export const Piece = {
 	// 9 is White king
@@ -9,7 +9,7 @@ export const Piece = {
 	sameColor: (piece: number | undefined, color: Color) => {
 		if (!piece) return false;
 		// black                       or  white
-		let pieceColor = piece & PieceColor.Black ? "Black" : "White" 
+		let pieceColor = piece & PieceColor.Black ? 'Black' : 'White';
 		return pieceColor === color;
 	},
 
@@ -19,10 +19,10 @@ export const Piece = {
 	 * @param pieceTypeToCompare
 	 * @returns boolean
 	 */
-		isType: (piece: number| undefined, pieceTypeToCompare: number) => {
-			if (!piece) return piece === pieceTypeToCompare;
-			return piece % 8 === pieceTypeToCompare;
-		},
+	isType: (piece: number | undefined, pieceTypeToCompare: number) => {
+		if (!piece) return piece === pieceTypeToCompare;
+		return piece % 8 === pieceTypeToCompare;
+	},
 
 	/**
 	 * return vertical index
@@ -39,7 +39,6 @@ export const Piece = {
 	getFile: (tileNumber: number) => tileNumber % 8,
 
 	getPiece: (piece: number) => {
-		return piece % 8
+		return piece % 8;
 	}
 };
-

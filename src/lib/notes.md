@@ -1,19 +1,27 @@
 [Session]
+
 <!-- White player identification -->
-White uuid 
+
+White uuid
+
 <!-- Black player identification -->
+
 Black uuid
+
 <!-- current state of the board -->
+
 whiteRemainingTime date
+
 <!-- remaining time for black -->
+
 blackRemainingTime date
+
 <!-- fen string summary for quick board translation -->
+
 fenstring string
 
 gameState enum["1-0","0-1","0-0"]
 boardHistory []
-
-
 
 ```
 () => {

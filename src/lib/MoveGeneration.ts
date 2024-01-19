@@ -1,5 +1,12 @@
-import { type Move, type CastlingRightsType, PieceType, direction, numberOfTilesToEdge, type Color } from "./misc";
-import { Piece } from "$lib/Piece";
+import {
+	type Move,
+	type CastlingRightsType,
+	PieceType,
+	direction,
+	numberOfTilesToEdge,
+	type Color
+} from './misc';
+import { Piece } from '$lib/Piece';
 
 export const generateCastlingMove = (
 	tileIndex: number,
@@ -12,9 +19,9 @@ export const generateCastlingMove = (
 
 	const tempMoveList: Move[] = [];
 
-	let castlingSide: ["kingSide" | "queenSide", number, number][] = [
-		["kingSide", 1, 3],
-		["queenSide", -1, 4]
+	let castlingSide: ['kingSide' | 'queenSide', number, number][] = [
+		['kingSide', 1, 3],
+		['queenSide', -1, 4]
 	];
 	// Combine kingside and queenside checks for efficiency
 	for (const [side, direction, rookOffset] of castlingSide) {
@@ -86,12 +93,10 @@ export const generatePawnMove = (
 
 			if (currentEnPassantTarget !== targetTile) {
 				// Break out of the loop if diagonal space isnt opponent piece or the space is empty
-				if ((!targetPiece || Piece.sameColor(targetPiece, friendlyColor)) && i !== 1)
-					break;
+				if ((!targetPiece || Piece.sameColor(targetPiece, friendlyColor)) && i !== 1) break;
 
 				// if target piece isnt empty, break out of the loop of forward is blocked, or diagonal is occupied by friendlies
-				if (!!targetPiece && (i === 1 || Piece.sameColor(targetPiece, friendlyColor)))
-					break;
+				if (!!targetPiece && (i === 1 || Piece.sameColor(targetPiece, friendlyColor))) break;
 			}
 
 			tempMoveList.push({
@@ -196,4 +201,3 @@ export const generateSlidingMove = (
 
 	return tempMoveList;
 };
-
