@@ -6,7 +6,6 @@
   export let remainingTime:number = Date.now() + 1000 * 30;
 
   let now = Date.now()
-
   const updateTimer = () => {
     now = Date.now();
   }
