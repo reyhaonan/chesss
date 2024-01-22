@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { convertNumberToAlgebraicNotation } from '$lib/Engine';
 	import { Piece } from '$lib/Piece';
-	import { PieceCharLookup, PieceType, fileArray } from '$lib/misc';
+	import { PieceCharLookup, PieceType, fileArray, rankArray } from '$lib/misc';
 	import boardLookup from '$stores/BoardLookup';
 	import moveHistory, { type moveHistoryType } from '$stores/MoveHistory';
 	import ControlBar from './ControlBar.svelte';
@@ -18,25 +18,38 @@
 		let isCapture = false;
 		if (!!move.pieceTarget || move.note === 'enPassant') isCapture = true;
 
-		let shouldSpecifyFiles =
+		let shouldSpecifyFile =
 			move.moveList.some(
 				(e) =>
 					e.start != move.startTile &&
+					Piece.getRank(e.start) === Piece.getRank(move.startTile) &&
 					e.target === move.targetTile &&
 					move.pieceToMove === move.newBoardArray.get(e.start)
 			) ||
 			(Piece.isType(move.pieceToMove, PieceType.Pawn) && isCapture);
 
-		let files: string = '';
+		let shouldSpecifyRank =
+			move.moveList.some(
+				(e) =>
+					e.start != move.startTile &&
+					Piece.getFile(e.start) === Piece.getFile(move.startTile) &&
+					e.target === move.targetTile &&
+					move.pieceToMove === move.newBoardArray.get(e.start)
+			) ||
+			(Piece.isType(move.pieceToMove, PieceType.Pawn) && isCapture);
+
+		let file: string = '';
+		let rank: string = '';
 
 		if (piece === 'P') piece = '';
-		if (shouldSpecifyFiles) files = fileArray[Piece.getFile(move.startTile)];
+		if (shouldSpecifyFile) file = fileArray[Piece.getFile(move.startTile)];
+		if (shouldSpecifyRank) rank = rankArray[Piece.getRank(move.startTile)].toString();
 
 		let isACheck = move.threatListToOpponent.some((e) =>
 			Piece.isType(move.newBoardArray.get(e.target), PieceType.King)
 		);
 
-		return `${piece}${files}${isCapture ? 'x' : ''}${targetNotation}${
+		return `${piece}${file}${rank}${isCapture ? 'x' : ''}${targetNotation}${
 			move.isCheckMate ? '#' : isACheck ? '+' : ''
 		}${isPromotion && move.pickedPiece ? PieceCharLookup[Piece.getPiece(move.pickedPiece)] : ''}`;
 	};
