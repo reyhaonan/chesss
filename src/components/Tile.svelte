@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Piece } from '$lib/Piece';
 	import type { Color } from '$lib/misc';
+	import { fade } from 'svelte/transition';
 
 	export let pieceNumber: number | undefined = 0;
 	export let highlightForMoveSuggestion = false;
@@ -18,7 +19,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="w-full flex items-center justify-center relative group"
+	class="absolute inset-0 flex items-center justify-center  group"
 	class:cursor-pointer={highlightForMoveSuggestion}
 	on:click
 	on:drop

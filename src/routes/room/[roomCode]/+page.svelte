@@ -24,11 +24,13 @@
 	import boardInfo from '$stores/BoardInfo';
 	import boardLookup from '$stores/BoardLookup';
 	import flipBoard from '$stores/FlipBoard';
-	import moveHistory from '$stores/MoveHistory';
-	import { has } from 'lodash';
+	import moveHistory from '$stores/MoveHistory';	
+	import type { delay, uniqueId } from 'lodash';
+	import { flip } from 'svelte/animate';
+	import { send, receive } from '$lib/transition';
 
-	// $boardInfo = convertFENToBoardArray(startingFEN);
-	$boardInfo = convertFENToBoardArray('3r3r/8/8/R7/4Q2Q/8/8/R6Q w KQkq - 0 1');
+	$boardInfo = convertFENToBoardArray(startingFEN);
+	// $boardInfo = convertFENToBoardArray('3r3r/8/8/R7/4Q2Q/8/8/R6Q w KQkq - 0 1');
 
 	$: [boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock] = $boardInfo;
 
@@ -38,7 +40,15 @@
 
 	let threatMoveList: Move[] = [];
 
-	$: boardToUse = $flipBoard ? reversedBoardIterable : boardIterable;
+	let boardToUse:{id: number, uniqueId:string, piece:number}[] = []
+
+	$: {
+		$flipBoard;
+		boardArray;
+		let tempBoard = []
+		tempBoard = $flipBoard ? reversedBoardIterable : boardIterable;
+		boardToUse = tempBoard.map(e => ({id:e, piece: boardArray.get(e)??0, uniqueId: `${e}-${boardArray.get(e)}`}))
+	}
 
 	let selectedTile: number = -1;
 
@@ -131,6 +141,8 @@
 
 	// Move fn
 	const move = async (move: Move) => {
+		selectedTile = -1
+
 		let { start: startTile, target: targetTile, note } = move;
 
 		console.log('MOVED ONCE');
@@ -176,7 +188,9 @@
 
 		console.log('surprise ', newCastlingRights);
 
-		lastMove = [startTile, targetTile];
+		setTimeout(() => {
+			lastMove = [startTile, targetTile];
+		},300)
 
 		$moveHistory = [
 			...$moveHistory,
@@ -187,7 +201,7 @@
 				newEnPassantTarget,
 				newHalfMoveClock,
 				newFullMoveClock,
-				lastMove,
+				lastMove: [startTile, targetTile],
 				turn,
 				startTile: move.start,
 				targetTile: move.target,
@@ -229,34 +243,42 @@
 {#if $boardLookup.current === $boardLookup.lookup}
 	<Board>
 		<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
-			{#each boardToUse as index}
-				<Tile
-					pieceNumber={boardArray.get(index)}
-					highlightLastMove={lastMove.some((e) => e === index)}
-					highlightForMoveSuggestion={!!moveList.find(
-						(move) => move.start === selectedTile && move.target === index
-					)}
-					highlightSelectedTile={selectedTile === index}
-					on:click={() => {
-						let moveToUse = moveList.find(
-							(move) => move.start === selectedTile && move.target === index
-						);
-						if (!!moveToUse) move(moveToUse);
-						else if (boardArray.has(index)) selectedTile = index;
-						else selectedTile = -1;
-					}}
-					on:drop={() => {
-						let moveToUse = moveList.find(
-							(move) => move.start === selectedTile && move.target === index
-						);
-						if (!!moveToUse) move(moveToUse);
-					}}
-					on:dragend={() => (selectedTile = -1)}
-					on:dragstart={() => (selectedTile = index)}
-					{turn}
-					highlightCheck={isCheck === index}
-					debugIndex={index}
-				/>
+			{#each boardToUse as tile (tile.uniqueId)}
+			
+				<div class="w-full aspect-square relative" 
+					in:receive={{ key: tile.piece, duration: 200 }}
+					out:send={{ key: tile.piece, duration: 200 }}
+					animate:flip={{ duration: 200 }}
+					> 
+					<Tile 
+						pieceNumber={tile.piece}
+						highlightLastMove={lastMove.some((e) => e === tile.id)}
+						highlightForMoveSuggestion={!!moveList.find(
+							(move) => move.start === selectedTile && move.target === tile.id
+						)}
+						highlightSelectedTile={selectedTile === tile.id}
+						on:click={() => {
+							let moveToUse = moveList.find(
+								(move) => move.start === selectedTile && move.target === tile.id
+							);
+							if (!!moveToUse) move(moveToUse);
+							else if (tile.piece !== 0) selectedTile = tile.id;
+							else selectedTile = -1;
+						}}
+						on:drop={() => {
+							let moveToUse = moveList.find(
+								(move) => move.start === selectedTile && move.target === tile.id
+							);
+							if (!!moveToUse) move(moveToUse);
+						}}
+						on:dragend={() => (selectedTile = -1)}
+						on:dragstart={() => (selectedTile = tile.id)}
+						turn={turn}
+						highlightCheck={isCheck === tile.id}
+						debugIndex={tile.id}
+					/>
+				</div>
+			
 			{/each}
 		</div>
 
@@ -330,7 +352,8 @@
 {:else}
 	<Board>
 		<div class="absolute inset-0 grid grid-cols-8 grid-rows-8" id="board">
-			{#each boardToUse as index}
+			{#each boardToUse as {id:index}}
+			<div class="w-full aspect-square relative">
 				<Tile
 					pieceNumber={$moveHistory[$boardLookup.lookup].newBoardArray.get(index)}
 					highlightLastMove={$moveHistory[$boardLookup.lookup].lastMove.some((e) => e === index)}
@@ -339,6 +362,7 @@
 					turn={$moveHistory[$boardLookup.lookup].turn}
 					debugIndex={index}
 				/>
+			</div>
 			{/each}
 		</div>
 	</Board>

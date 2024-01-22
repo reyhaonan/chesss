@@ -18,12 +18,12 @@
 	use:disableRightClick
 >
 	<!-- Indication row -->
-	<div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 font-bold">
+	<div class="h-full absolute grid grid-rows-8 justify-around left-0 top-0 font-bold z-10">
 		{#each rankToUse as num, i}
 			<div class={`pl-1 text-background`}>{num}</div>
 		{/each}
 	</div>
-	<div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 font-bold">
+	<div class="w-full absolute grid grid-cols-8 justify-around bottom-0 left-0 font-bold z-10">
 		{#each fileToUse as alp, i}
 			<div class={`pb-1 text-right pr-2 text-background`}>{alp}</div>
 		{/each}
