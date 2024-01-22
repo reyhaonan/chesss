@@ -4,7 +4,7 @@
 	import RightSidebar from '$components/RightSidebar.svelte';
 </script>
 
-<div class="grid grid-cols-12 h-screen pb-3 overflow-hidden">
+<div class="grid grid-cols-12 h-screen overflow-hidden">
 	<Navbar />
 	<LeftSidebar />
 	<main class="col-span-6">
