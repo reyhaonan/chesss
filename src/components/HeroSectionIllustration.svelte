@@ -8,7 +8,7 @@
 	</div>
 	<div class="w-20 aspect-square bg-[#9ed6b2ca] relative">
 		<div
-			class="w-11/12 border-background/50 border-[6px] rounded-full transition-all duration-75 aspect-square absolute-center"
+			class="w-1/3 bg-background/50 transition-all duration-75 rounded-full aspect-square absolute-center"
 		></div>
 	</div>
 	<div class="w-20 aspect-square relative bg-[#9ed6b2ca] flex items-center justify-center">
