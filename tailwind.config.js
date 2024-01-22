@@ -9,7 +9,7 @@ export default {
 		themes: [
 			{
 				chessTheme: {
-					...require("daisyui/src/theming/themes")["dark"],
+					...require('daisyui/src/theming/themes')['dark'],
 					primary: '#9fd7b3',
 					secondary: '#335c79',
 					accent: '#6b7ec1',
@@ -36,6 +36,6 @@ export default {
 		}
 	},
 	// plugins: [(daisyui)],
-	plugins: [require("daisyui")],
+	plugins: [require('daisyui')],
 	darkmode: 'class'
 };

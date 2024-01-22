@@ -27,7 +27,7 @@ const config = {
 			$components: './src/components/*',
 			$stores: './src/stores/*'
 		}
-	},
+	}
 };
 
 export default config;

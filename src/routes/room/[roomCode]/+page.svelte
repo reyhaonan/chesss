@@ -28,7 +28,7 @@
 	import { has } from 'lodash';
 
 	// $boardInfo = convertFENToBoardArray(startingFEN);
-	$boardInfo = convertFENToBoardArray("3r3r/8/8/R7/4Q2Q/8/8/R6Q w KQkq - 0 1")
+	$boardInfo = convertFENToBoardArray('3r3r/8/8/R7/4Q2Q/8/8/R6Q w KQkq - 0 1');
 
 	$: [boardArray, turn, castlingRights, enPassantTarget, halfMoveClock, fullMoveClock] = $boardInfo;
 
