@@ -12,7 +12,7 @@
 	$: s = count - h * 3600 - m * 60;
 
 	let interval = setInterval(updateTimer, 1000);
-	$: if (count === 0) clearInterval(interval);
+	$: if (count <= 0) clearInterval(interval);
 
 	const padValue = (value: number, length = 2, char = '0') => {
 		const { length: currentLength } = value.toString();
