@@ -17,15 +17,13 @@
 		type BoardHistory,
 		PieceColor,
 		PieceType,
-		type CastlingRightsType,
 		boardIterable,
 		reversedBoardIterable
 	} from '$lib/misc';
 	import boardInfo from '$stores/BoardInfo';
 	import boardLookup from '$stores/BoardLookup';
 	import flipBoard from '$stores/FlipBoard';
-	import moveHistory from '$stores/MoveHistory';	
-	import type { delay, uniqueId } from 'lodash';
+	import moveHistory from '$stores/MoveHistory';
 	import { flip } from 'svelte/animate';
 	import { send, receive } from '$lib/transition';
 
@@ -190,7 +188,7 @@
 
 		setTimeout(() => {
 			lastMove = [startTile, targetTile];
-		},300)
+		},400)
 
 		$moveHistory = [
 			...$moveHistory,
