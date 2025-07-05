@@ -21,16 +21,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
+          cache: pnpm
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: build
         env:
           BASE_PATH: '/'
         run: |
-          yarn build
+          pnpm build
 
       - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v3
