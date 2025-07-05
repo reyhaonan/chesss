@@ -1,13 +1,17 @@
 <script>
 	import '$lib/app.css';
-
-	import { blur } from 'svelte/transition';
-
-	export let data;
+	import LeftSidebar from '$components/LeftSidebar.svelte';
+	import Navbar from '$components/Navbar.svelte';
+	import RightSidebar from '$components/RightSidebar.svelte';
 </script>
 
-{#key data.url}
-	<div transition:blur={{ amount: 10 }}>
-		<slot />
-	</div>
-{/key}
+<div class="grid grid-cols-12 h-screen overflow-hidden">
+	<Navbar />
+	<LeftSidebar />
+	<main class="col-span-6">
+		<div class="w-full my-8">
+			<slot />
+		</div>
+	</main>
+	<RightSidebar />
+</div>
