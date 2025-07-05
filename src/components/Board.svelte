@@ -14,7 +14,7 @@
 
 <div
 	class="h-[80vh] mx-auto aspect-square rounded-md relative bg-cover bg-center"
-	style="background-image: url('/board.svg');"
+	style="background-image: url('/chess/board.svg');"
 	use:disableRightClick
 >
 	<!-- Indication row -->

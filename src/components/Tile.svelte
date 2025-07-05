@@ -29,7 +29,7 @@
 >
 	{#if !!pieceNumber}
 		<img
-			src={`/pawn_default/${pieceNumber}.svg`}
+			src={`/chess/pawn_default/${pieceNumber}.svg`}
 			class="select-none w-4/5 z-20 cursor-pointer"
 			alt=""
 			draggable={correctTurn ? true : false}
