@@ -1,1 +1,1 @@
-I was bored of making the same e commerce website
+To learn svelte, im building a simple chess app
